@@ -1,0 +1,29 @@
+{
+  "name": "clientstate-master",
+  "version": "0.0.0",
+  "authors": [
+    "Skylar Saveland <skylar.saveland@gmail.com>"
+  ],
+  "description": "Database connections. In. The. Browser.",
+  "main": "server.js",
+  "moduleType": [
+    "node"
+  ],
+  "keywords": [
+    "futuristic"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/skyl",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "oauth-js": "~0.2.4",
+    "angular": "~1.2.26"
+  }
+}

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html ng-app="CSMApp" ng-controller="CSMController">
+<head>
+  <script src="lib/angular/angular.min.js"></script>
+  <script src="lib/oauth-js/dist/oauth.js"></script>
+  <script src="public/index.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="lib/bootstrap/dist/css/bootstrap.min.css">
+  <!--<link rel="stylesheet" type="text/css" href="public/style.css">-->
+  <meta name="viewport" content="width=device-width, initial-scale=0.48" />
+  <title>ClientState</title>
+  <!-- <link rel="shortcut icon" href="favicon.ico?v=2309jfaodso"> -->
+</head>
+<body>
+
+  <button ng-show="!github_access_token"
+          ng-click="github_login()"
+          class="btn btn-primary btn-random">
+    <!--<img src="img/octocat.png" title="Connect with Github" />-->
+    Github Login
+  </button>
+
+</body>
+</html>
