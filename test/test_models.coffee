@@ -5,6 +5,7 @@ models = {
 
 {assert} = require "chai"
 
+
 beforeEach (done) ->
   # http://stackoverflow.com/a/18060545/177293
   knexion.raw(
