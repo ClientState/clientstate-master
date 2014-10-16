@@ -10,7 +10,8 @@
       password: process.env.PG_PASSWORD,
       database: 'csm',
       charset: 'utf8'
-    }
+    },
+    debug: true
   });
 
   module.exports.knex = knex;

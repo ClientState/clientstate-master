@@ -2,25 +2,35 @@
 bookshelf = require('bookshelf')(knex)
 
 
-class User extends bookshelf.Model
-  @tableName: 'users'
+User = bookshelf.Model.extend
+  #@tableName: 'users'
+  tableName: 'users'
+  hasTimestamps: true
 
-  @logins: () ->
+  logins: () ->
     @hasMany ProviderLoginDetails
 
-  @createTable: (t) ->
+User.createTable = (t) ->
     t.increments 'id'
     #t.string 'first_name'
     #t.string 'last_name'
     #t.string 'password'
     t.timestamps()
+User.tableName = 'users'
+
+ProviderLoginDetails = bookshelf.Model.extend
+  # http://stackoverflow.com/a/19506170/177293
+  # hrm .. if I want to use Model.tableName without new ...
+  #@tableName: 'provider_login_details'
+  # this is the way it wants to be for bookshelf new/forge
+  tableName: 'provider_login_details'
+  hasTimestamps: true
 
 
-class ProviderLoginDetails extends bookshelf.Model
-  @tableName: 'provider_login_details'
-
-  @createTable: (t) ->
-    t.increments 'id'
+ProviderLoginDetails.createTable = (t) ->
+    #t.increments 'id'
+    # Provider unique id
+    t.string('id').primary()
     t.string 'provider'
     t.text 'data'
     t.timestamps()
@@ -30,7 +40,28 @@ class ProviderLoginDetails extends bookshelf.Model
       .inTable('users')
       # .onDelete
       # .onUpdate
+ProviderLoginDetails.tableName = 'provider_login_details'
 
+
+###
+
+ProviderLoginDetails = bookshelf.Model.extend
+  tableName: 'provider_login_details'
+
+  createTable: (t) ->
+    #t.increments 'id'
+    # Provider unique id
+    t.string('id').primary()
+    t.string 'provider'
+    t.text 'data'
+    t.timestamps()
+    t.integer('user_id')
+      .unsigned()
+      .references('id')
+      .inTable('users')
+      # .onDelete
+      # .onUpdate
+###
 
 ###
 class App extends bookshelf.Model
@@ -73,6 +104,6 @@ class ServiceDeployment extends bookshelf.Model
     @hasOne Service
 ###
 
-
+global.bookshelf = bookshelf
 module.exports.User = User
 module.exports.ProviderLoginDetails = ProviderLoginDetails
