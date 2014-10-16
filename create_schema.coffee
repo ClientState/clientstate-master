@@ -1,8 +1,8 @@
-{knex} = require "./conn"
+require "./conn"
 
 for name, Model of require "./models"
   console.log "create table for", name
-  s = knex.schema.createTableIfNotExists(
+  s = knexion.schema.createTableIfNotExists(
     Model.tableName, Model.createTable
   ).then (a, b, c) ->
   s.yield()

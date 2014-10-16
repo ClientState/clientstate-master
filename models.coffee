@@ -1,5 +1,5 @@
-{knex} = require './conn'
-bookshelf = require('bookshelf')(knex)
+require './conn'
+bookshelf = require('bookshelf')(knexion)
 
 
 User = bookshelf.Model.extend

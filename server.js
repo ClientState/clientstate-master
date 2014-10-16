@@ -51,15 +51,6 @@
     return trans["catch"](function(err) {
       return console.log("ERR", err);
     });
-
-    /*
-    console.log '**************************************'
-    console.log result
-    console.log()
-    console.log()
-    console.log()
-    console.log()
-     */
   });
 
   app.use("/public", express["static"]("" + __dirname + "/public"));

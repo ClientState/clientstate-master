@@ -40,14 +40,6 @@ oauth.emitters.github.on 'complete', (result) ->
 
   trans.catch (err) ->
     console.log "ERR", err
-  ###
-  console.log '**************************************'
-  console.log result
-  console.log()
-  console.log()
-  console.log()
-  console.log()
-  ###
 
 
 app.use "/public", express.static "#{__dirname}/public"
