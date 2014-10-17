@@ -54,4 +54,24 @@ describe 'Transaction', () ->
         done()
 
 
+describe 'User has many ProviderLoginDetails', () ->
+
+  it 'User.logins returns ProviderLoginDetails', (done) ->
+    # save a new User
+    (new User).save(null, method: "insert").then (user) ->
+      # create a PLD for the user
+      pld = new ProviderLoginDetails
+        id: "razzafrazza"
+        provider: "github"
+        data: '{"some": "thing"}'
+        user_id: user.id
+      pld.save(null, method: "insert").then (new_pld) ->
+        # fetch the related user
+        new_pld.user().fetch().then (reluser) ->
+          assert reluser.get('id') is user.id is 1
+
+          # fetch the logins for this user
+          reluser.logins().fetch().then (plds) ->
+            assert plds.models[0].get('id') is 'razzafrazza'
+            done()
 

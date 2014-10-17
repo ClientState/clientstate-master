@@ -94,4 +94,32 @@
     });
   });
 
+  describe('User has many ProviderLoginDetails', function() {
+    return it('User.logins returns ProviderLoginDetails', function(done) {
+      return (new User).save(null, {
+        method: "insert"
+      }).then(function(user) {
+        var pld;
+        pld = new ProviderLoginDetails({
+          id: "razzafrazza",
+          provider: "github",
+          data: '{"some": "thing"}',
+          user_id: user.id
+        });
+        return pld.save(null, {
+          method: "insert"
+        }).then(function(new_pld) {
+          return new_pld.user().fetch().then(function(reluser) {
+            var _ref1;
+            assert((reluser.get('id') === (_ref1 = user.id) && _ref1 === 1));
+            return reluser.logins().fetch().then(function(plds) {
+              assert(plds.models[0].get('id') === 'razzafrazza');
+              return done();
+            });
+          });
+        });
+      });
+    });
+  });
+
 }).call(this);

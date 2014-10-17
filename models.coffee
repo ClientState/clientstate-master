@@ -2,34 +2,29 @@ require './conn'
 bookshelf = require('bookshelf')(knexion)
 
 
-User = bookshelf.Model.extend
-  #@tableName: 'users'
+class User extends bookshelf.Model
   tableName: 'users'
   hasTimestamps: true
 
   logins: () ->
-    @hasMany ProviderLoginDetails
+    this.hasMany ProviderLoginDetails
 
-User.createTable = (t) ->
+  # DDL with knex
+  @tableName = 'users'
+  @createTable = (t) ->
     t.increments 'id'
-    #t.string 'first_name'
-    #t.string 'last_name'
-    #t.string 'password'
     t.timestamps()
-User.tableName = 'users'
 
-ProviderLoginDetails = bookshelf.Model.extend
-  # http://stackoverflow.com/a/19506170/177293
-  # hrm .. if I want to use Model.tableName without new ...
-  #@tableName: 'provider_login_details'
-  # this is the way it wants to be for bookshelf new/forge
+
+class ProviderLoginDetails extends bookshelf.Model
   tableName: 'provider_login_details'
   hasTimestamps: true
 
+  user: () ->
+    this.belongsTo User
 
-ProviderLoginDetails.createTable = (t) ->
-    #t.increments 'id'
-    # Provider unique id
+  @tableName = 'provider_login_details'
+  @createTable = (t) ->
     t.string('id').primary()
     t.string 'provider'
     t.text 'data'
@@ -40,7 +35,9 @@ ProviderLoginDetails.createTable = (t) ->
       .inTable('users')
       # .onDelete
       # .onUpdate
-ProviderLoginDetails.tableName = 'provider_login_details'
+
+
+
 
 
 ###
