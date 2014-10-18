@@ -58,7 +58,7 @@ describe 'User has many ProviderLoginDetails', () ->
 
   it 'User.logins returns ProviderLoginDetails', (done) ->
     # save a new User
-    (new User).save(null, method: "insert").then (user) ->
+    (new User).save().then (user) ->
       # create a PLD for the user
       pld = new ProviderLoginDetails
         id: "razzafrazza"
@@ -74,4 +74,21 @@ describe 'User has many ProviderLoginDetails', () ->
           reluser.logins().fetch().then (plds) ->
             assert plds.models[0].get('id') is 'razzafrazza'
             done()
+
+
+describe 'Collections', () ->
+
+  beforeEach (done) ->
+    (new User).save().then (user) ->
+      done()
+
+  it 'hrm', (done) ->
+    User.collection().fetch().then (collection) ->
+      assert collection.models[0].id is 1
+      done()
+
+
+
+
+
 

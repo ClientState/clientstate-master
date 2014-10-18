@@ -4,6 +4,7 @@
   "description": "ClientState users, builds and deployments",
   "main": "main.js",
   "dependencies": {
+    "bluebird": "^2.3.6",
     "bookshelf": "^0.7.7",
     "chai": "^1.9.2",
     "express": "^4.9.7",

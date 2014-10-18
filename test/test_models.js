@@ -96,9 +96,7 @@
 
   describe('User has many ProviderLoginDetails', function() {
     return it('User.logins returns ProviderLoginDetails', function(done) {
-      return (new User).save(null, {
-        method: "insert"
-      }).then(function(user) {
+      return (new User).save().then(function(user) {
         var pld;
         pld = new ProviderLoginDetails({
           id: "razzafrazza",
@@ -118,6 +116,20 @@
             });
           });
         });
+      });
+    });
+  });
+
+  describe('Collections', function() {
+    beforeEach(function(done) {
+      return (new User).save().then(function(user) {
+        return done();
+      });
+    });
+    return it('hrm', function(done) {
+      return User.collection().fetch().then(function(collection) {
+        assert(collection.models[0].id === 1);
+        return done();
       });
     });
   });
