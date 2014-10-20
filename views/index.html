@@ -20,5 +20,17 @@
     Github Login
   </button>
 
+  <div ng-show="github_access_token">
+    <!-- Edit existing Apps -->
+    <div ng-repeat="app in apps">
+      <input ng-model="app.name" />
+    </div>
+    <!-- Create a new App -->
+    <div id="new-app">
+      <input ng-model="newAppName" placeholder="New App Name" />
+    </div>
+  </div>
+
+
 </body>
 </html>

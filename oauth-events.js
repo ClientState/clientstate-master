@@ -11,7 +11,8 @@
       uid = result.user_data.id;
       model = {
         id: uid,
-        provider: "github"
+        provider: "github",
+        access_token: result.data.access_token
       };
       return new ProviderLoginDetails(model).fetch(null, {
         transaction: t

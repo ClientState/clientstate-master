@@ -8,7 +8,7 @@
   CSMController = function($scope, $http) {
     window.scope = $scope;
     $scope.clientid = "b6d50cdc7d9372561081";
-    return $scope.github_login = function() {
+    $scope.github_login = function() {
       OAuth.initialize($scope.clientid);
       OAuth.setOAuthdURL(window.location.origin);
       OAuth.popup("github", function(err, provider_data) {
@@ -17,8 +17,12 @@
           console.log(err.stack);
         }
         $scope.github_access_token = provider_data.access_token;
-        return $scope.$apply();
+        $scope.$apply();
+        return $scope.get_apps();
       });
+    };
+    return $scope.get_apps = function() {
+      return console.log("get_apps!");
     };
   };
 

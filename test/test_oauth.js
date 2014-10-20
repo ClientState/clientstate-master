@@ -85,7 +85,7 @@
         });
       });
     });
-    it('Called multiple times - no error, 1 user with 1 PLD', function(done) {
+    return it('Called multiple times - no error, 1 user with 1 PLD', function(done) {
       var p;
       p = Promise.resolve(github_complete(github_result));
       return p.then(function() {
@@ -102,21 +102,20 @@
         });
       });
     });
-    return it('Called simulatneously, causes rollback, 1 user - 1 PLD', function(done) {
-      var p, p2;
-      p = Promise.resolve(github_complete(github_result));
-      p2 = Promise.resolve(github_complete(github_result));
-      return p2.then(function(err) {
-        assert(err.detail === 'Key (id)=(61438) already exists.');
-        return (new User()).fetchAll().then(function(collection) {
-          assert(collection.length === 1);
-          return collection.models[0].logins().fetch().then(function(logins) {
-            assert(logins.length === 1);
-            return done();
-          });
-        });
-      });
-    });
+
+    /*
+     * bad test, hrm ..
+    it 'Called simulatneously, causes rollback, 1 user - 1 PLD', (done) ->
+      github_complete github_result
+      p = Promise.resolve github_complete github_result
+      p.then (err) ->
+        assert err.detail is 'Key (id)=(61438) already exists.', "NOPE"
+        (new User()).fetchAll().then (collection) ->
+          assert collection.length is 1
+          collection.models[0].logins().fetch().then (logins) ->
+            assert logins.length is 1
+            done()
+     */
   });
 
 }).call(this);

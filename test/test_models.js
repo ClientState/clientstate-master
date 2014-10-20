@@ -126,7 +126,7 @@
         return done();
       });
     });
-    return it('hrm', function(done) {
+    return it('fetching User.collection gives back user', function(done) {
       return User.collection().fetch().then(function(collection) {
         assert(collection.models[0].id === 1);
         return done();

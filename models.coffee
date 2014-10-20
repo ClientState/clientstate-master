@@ -21,12 +21,13 @@ class ProviderLoginDetails extends bookshelf.Model
   hasTimestamps: true
 
   user: () ->
-    this.belongsTo User
+    @belongsTo User
 
   @tableName = 'provider_login_details'
-  @createTable = (t) ->
+  @createTable: (t) ->
     t.string('id').primary()
     t.string 'provider'
+    t.string('access_token').index().unique()
     t.text 'data'
     t.timestamps()
     t.integer('user_id')
@@ -37,34 +38,9 @@ class ProviderLoginDetails extends bookshelf.Model
       # .onUpdate
 
 
-
-
-
-###
-
-ProviderLoginDetails = bookshelf.Model.extend
-  tableName: 'provider_login_details'
-
-  createTable: (t) ->
-    #t.increments 'id'
-    # Provider unique id
-    t.string('id').primary()
-    t.string 'provider'
-    t.text 'data'
-    t.timestamps()
-    t.integer('user_id')
-      .unsigned()
-      .references('id')
-      .inTable('users')
-      # .onDelete
-      # .onUpdate
-###
-
-###
 class App extends bookshelf.Model
   tableName: 'apps'
-
-  # many ProviderIDSecrets
+  hasTimestamps: true
 
   user: () ->
     @belongsTo User
@@ -72,35 +48,63 @@ class App extends bookshelf.Model
   services: () ->
     @hasMany Service
 
+  provider_id_secrets: () ->
+    @hasMany ProviderIDSecret
+
+  @tableName = 'apps'
+  @createTable = (t) ->
+    t.increments 'id'
+    t.timestamps()
+    t.string 'name'
+    t.integer('user_id')
+      .unsigned()
+      .references('id')
+      .inTable('users')
+
 
 class ProviderIDSecret extends bookshelf.Model
   tableName: 'provider_id_secrets'
+  hasTimestamps: true
 
-  # provider
-  # client_id
-  # client_secret
+  app: () ->
+    @belongsTo App
+
+  @tableName = 'provider_id_secrets'
+  @createTable = (t) ->
+    t.increments 'id'
+    t.timestamps()
+    t.string 'client_id'
+    t.string 'client_secret'
+    t.integer('app_id')
+      .unsigned()
+      .references('id')
+      .inTable('apps')
+
+
+class Service extends bookshelf.Model
+  tableName: 'services'
+  hasTimestamps: true
 
   app: () ->
     @belongsTo App
 
 
-class Service extends bookshelf.Model
-  tableName: 'services'
+  @tableName = 'services'
+  @createTable = (t) ->
+    t.increments 'id'
+    t.timestamps()
+    t.string 'name'
+    t.string 'address'
+    t.string 'port'
+    t.integer('app_id')
+      .unsigned()
+      .references('id')
+      .inTable('apps')
 
-  secrets: () ->
-    @hasMany ProviderIDSecret
-
-  deployments: () ->
-    @hasMany ServiceDeployment
-
-
-class ServiceDeployment extends bookshelf.Model
-  tableName: 'service_deployments'
-
-  service: () ->
-    @hasOne Service
-###
 
 global.bookshelf = bookshelf
 module.exports.User = User
 module.exports.ProviderLoginDetails = ProviderLoginDetails
+module.exports.App = App
+module.exports.ProviderIDSecret = ProviderIDSecret
+module.exports.Service = Service

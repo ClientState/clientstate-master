@@ -82,7 +82,7 @@ describe 'Collections', () ->
     (new User).save().then (user) ->
       done()
 
-  it 'hrm', (done) ->
+  it 'fetching User.collection gives back user', (done) ->
     User.collection().fetch().then (collection) ->
       assert collection.models[0].id is 1
       done()

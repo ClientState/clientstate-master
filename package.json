@@ -11,7 +11,8 @@
     "knex": "^0.7.3",
     "mocha": "^1.21.5",
     "oauth-express": "0.0.1",
-    "pg": "^3.5.0"
+    "pg": "^3.5.0",
+    "supertest": "^0.14.0"
   },
   "devDependencies": {},
   "scripts": {

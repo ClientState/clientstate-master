@@ -17,7 +17,11 @@ CSMController = ($scope, $http) ->
         console.log err.stack
       $scope.github_access_token = provider_data.access_token
       $scope.$apply()
+      $scope.get_apps()
     return
+
+  $scope.get_apps = () ->
+    console.log "get_apps!"
 
 CSMController.$inject = ['$scope', '$http']
 angular.module('CSMApp').controller 'CSMController', CSMController

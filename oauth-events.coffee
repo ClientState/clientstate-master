@@ -13,6 +13,7 @@ github_complete = (result) ->
     model =
       id: uid
       provider: "github"
+      access_token: result.data.access_token
 
     new ProviderLoginDetails(model).fetch(null, transaction: t).then (m) ->
       if m is null
