@@ -17,12 +17,22 @@
           console.log(err.stack);
         }
         $scope.github_access_token = provider_data.access_token;
+        $http.defaults.headers.common.access_token = $scope.github_access_token;
         $scope.$apply();
         return $scope.get_apps();
       });
     };
-    return $scope.get_apps = function() {
-      return console.log("get_apps!");
+    $scope.get_apps = function() {
+      return $http.get('/apps').success(function(res) {
+        return $scope.apps = res;
+      });
+    };
+    return $scope.create_new_app = function() {
+      return $http.post('/apps', {
+        name: $scope.newAppName
+      }).success(function(res) {
+        return $scope.get_apps();
+      });
     };
   };
 

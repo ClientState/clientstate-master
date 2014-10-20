@@ -5,6 +5,7 @@
   "main": "main.js",
   "dependencies": {
     "bluebird": "^2.3.6",
+    "body-parser": "^1.9.0",
     "bookshelf": "^0.7.7",
     "chai": "^1.9.2",
     "express": "^4.9.7",

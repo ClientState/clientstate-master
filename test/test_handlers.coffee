@@ -41,3 +41,27 @@ describe 'Get Apps for User', () ->
     request(app)
       .get('/apps')
       .expect(403, done)
+  it 'returns 403 with non-existent access_token', (done) ->
+    request(app)
+      .get('/apps')
+      .set(access_token: "nonExiStent")
+      .expect(403, done)
+
+
+describe 'Create new App for User', () ->
+  beforeEach createAppForUser
+
+  it 'creates App through REST', (done) ->
+    request(app)
+      .post('/apps')
+      .set(access_token: "qwerty")
+      .set("Content-Type": "application/json;charset=UTF-8")
+      .send('{"name":"Frilz-not-kidding"}')
+      .expect(200)
+      .end (err, res) ->
+        new App(user_id: 1).fetchAll().then (apps) ->
+          assert.equal apps.length, 2
+          assert.equal(apps._byId['2'].get('name'), "Frilz-not-kidding")
+          done()
+
+

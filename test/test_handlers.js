@@ -54,8 +54,32 @@
         return done();
       });
     });
-    return it('returns 403 with no access_token', function(done) {
+    it('returns 403 with no access_token', function(done) {
       return request(app).get('/apps').expect(403, done);
+    });
+    return it('returns 403 with non-existent access_token', function(done) {
+      return request(app).get('/apps').set({
+        access_token: "nonExiStent"
+      }).expect(403, done);
+    });
+  });
+
+  describe('Create new App for User', function() {
+    beforeEach(createAppForUser);
+    return it('creates App through REST', function(done) {
+      return request(app).post('/apps').set({
+        access_token: "qwerty"
+      }).set({
+        "Content-Type": "application/json;charset=UTF-8"
+      }).send('{"name":"Frilz-not-kidding"}').expect(200).end(function(err, res) {
+        return new App({
+          user_id: 1
+        }).fetchAll().then(function(apps) {
+          assert.equal(apps.length, 2);
+          assert.equal(apps._byId['2'].get('name'), "Frilz-not-kidding");
+          return done();
+        });
+      });
     });
   });
 

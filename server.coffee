@@ -3,6 +3,10 @@ app = express()
 oauth = require 'oauth-express'
 mod = require './models'
 
+bodyParser = require 'body-parser'
+app.use bodyParser.json()
+app.use bodyParser.urlencoded extended: true
+
 # oauth-express
 app.get '/auth/:provider', oauth.handlers.auth_provider_redirect
 app.get '/auth_callback/:provider', oauth.handlers.auth_callback
@@ -21,6 +25,10 @@ auth = (req, res, next) ->
     res.status(403).write "valid access_token header required"
     res.send()
 
+  if req.headers.access_token is undefined
+    abort()
+
+  # TODO: cache access_token - don't hit database
   (new mod.ProviderLoginDetails(
     access_token: req.headers.access_token)
   ).fetch(withRelated: ['user']).then (pld) ->
@@ -36,16 +44,29 @@ auth = (req, res, next) ->
       abort()
       return
 
+app.use auth
 
-app.get "/apps", auth, (req, res) ->
+
+# TODO: handle errors
+app.get "/apps", (req, res) ->
+  # list all Apps for User
   new mod.App(user_id: req.user.id).fetchAll().then (collection) ->
     res.send collection.toJSON()
+    return
+
+app.post "/apps", (req, res) ->
+  # create new App for User
+  app = new mod.App
+    name: req.body.name
+    user_id: req.user.id
+  app.save().then () ->
+    res.send "OK"
     return
 
 # app at ENV -- GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET
 # must match the callback url, in this case,
 # http://localhost:4000/auth_callback/github
 server = app.listen 4000, () ->
-    console.log 'Listening on port %d', server.address().port
+  console.log 'Listening on port %d', server.address().port
 
 module.exports.app = app

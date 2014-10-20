@@ -16,7 +16,9 @@
         _results.push(v.tableName);
       }
       return _results;
-    })()).join(',')) + " RESTART IDENTITY").then(done());
+    })()).join(',')) + " RESTART IDENTITY").then(function() {
+      return done();
+    });
   });
 
   describe('User model tests', function() {

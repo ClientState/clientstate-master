@@ -10,7 +10,8 @@ beforeEach (done) ->
   # http://stackoverflow.com/a/18060545/177293
   knexion.raw(
     "TRUNCATE TABLE #{(v.tableName for k,v of models).join(',')} RESTART IDENTITY"
-  ).then done()
+  ).then () ->
+    done()
 
 
 describe 'User model tests', () ->
