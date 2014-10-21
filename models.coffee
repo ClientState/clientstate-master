@@ -14,6 +14,7 @@ class User extends bookshelf.Model
   @createTable = (t) ->
     t.increments 'id'
     t.timestamps()
+    return
 
 
 class ProviderLoginDetails extends bookshelf.Model
@@ -34,6 +35,7 @@ class ProviderLoginDetails extends bookshelf.Model
       .unsigned()
       .references('id')
       .inTable('users')
+    return
       # .onDelete
       # .onUpdate
 
@@ -53,13 +55,14 @@ class App extends bookshelf.Model
 
   @tableName = 'apps'
   @createTable = (t) ->
-    t.increments 'id'
+    t.string('id').primary()
     t.timestamps()
     t.string 'name'
     t.integer('user_id')
       .unsigned()
       .references('id')
       .inTable('users')
+    return
 
 
 class ProviderIDSecret extends bookshelf.Model
@@ -75,10 +78,10 @@ class ProviderIDSecret extends bookshelf.Model
     t.timestamps()
     t.string 'client_id'
     t.string 'client_secret'
-    t.integer('app_id')
-      .unsigned()
+    t.string('app_id')
       .references('id')
       .inTable('apps')
+    return
 
 
 class Service extends bookshelf.Model
@@ -96,10 +99,10 @@ class Service extends bookshelf.Model
     t.string 'name'
     t.string 'address'
     t.string 'port'
-    t.integer('app_id')
-      .unsigned()
+    t.string('app_id')
       .references('id')
       .inTable('apps')
+    return
 
 
 global.bookshelf = bookshelf

@@ -29,6 +29,11 @@ CSMController = ($scope, $http) ->
   $scope.create_new_app = () ->
     $http.post('/apps', name: $scope.newAppName).success (res) ->
       # should we just insert into our array without calling over http?
+      $scope.newAppName = ""
+      $scope.get_apps()
+
+  $scope.create_service = (name, app_id) ->
+    $http.post("/apps/#{app_id}/services", {name: name}).success (res) ->
       $scope.get_apps()
 
 CSMController.$inject = ['$scope', '$http']

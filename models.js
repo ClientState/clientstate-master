@@ -27,7 +27,7 @@
 
     User.createTable = function(t) {
       t.increments('id');
-      return t.timestamps();
+      t.timestamps();
     };
 
     return User;
@@ -57,7 +57,7 @@
       t.string('access_token').index().unique();
       t.text('data');
       t.timestamps();
-      return t.integer('user_id').unsigned().references('id').inTable('users');
+      t.integer('user_id').unsigned().references('id').inTable('users');
     };
 
     return ProviderLoginDetails;
@@ -90,10 +90,10 @@
     App.tableName = 'apps';
 
     App.createTable = function(t) {
-      t.increments('id');
+      t.string('id').primary();
       t.timestamps();
       t.string('name');
-      return t.integer('user_id').unsigned().references('id').inTable('users');
+      t.integer('user_id').unsigned().references('id').inTable('users');
     };
 
     return App;
@@ -122,7 +122,7 @@
       t.timestamps();
       t.string('client_id');
       t.string('client_secret');
-      return t.integer('app_id').unsigned().references('id').inTable('apps');
+      t.string('app_id').references('id').inTable('apps');
     };
 
     return ProviderIDSecret;
@@ -152,7 +152,7 @@
       t.string('name');
       t.string('address');
       t.string('port');
-      return t.integer('app_id').unsigned().references('id').inTable('apps');
+      t.string('app_id').references('id').inTable('apps');
     };
 
     return Service;

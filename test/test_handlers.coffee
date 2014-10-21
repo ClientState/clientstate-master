@@ -10,6 +10,11 @@ models = {
 {assert} = require "chai"
 
 
+global.uuid = {
+  v4: () ->
+    "other-uuid"
+}
+
 createAppForUser = (done) ->
   knexion.raw(
     "TRUNCATE TABLE #{(v.tableName for k,v of models).join(',')} RESTART IDENTITY"
@@ -21,8 +26,12 @@ createAppForUser = (done) ->
         access_token: "qwerty"
         data: {}
         user_id: user.get 'id'
-      (new ProviderLoginDetails(details)).save(null, method: "insert").then (pld) ->
-        (new App(name: "meltodies", user_id: user.id)).save().then (app) ->
+      new ProviderLoginDetails(details).save(null, method: "insert").then (pld) ->
+        new App(
+          id: "this-uuid"
+          name: "meltodies"
+          user_id: user.id
+        ).save(null, method: "insert").then (app) ->
           done()
 
 
@@ -61,7 +70,47 @@ describe 'Create new App for User', () ->
       .end (err, res) ->
         new App(user_id: 1).fetchAll().then (apps) ->
           assert.equal apps.length, 2
-          assert.equal(apps._byId['2'].get('name'), "Frilz-not-kidding")
+          assert.equal(apps._byId['other-uuid'].get('name'), "Frilz-not-kidding")
           done()
+
+
+describe 'Services for App', () ->
+  beforeEach createAppForUser
+  it 'empty list of Services for App', (done) ->
+    request(app)
+      .get('/apps/1/services')
+      .set(access_token: "qwerty")
+      .expect(200)
+      .expect('[]', done)
+
+  it '404 for bad id', (done) ->
+    request(app)
+      .post('/apps/this-id-is-nogood/services')
+      .set(access_token: "qwerty")
+      .set("Content-Type": "application/json;charset=UTF-8")
+      .send('{"name": "redis"}')
+      .expect(404)
+      .end (err, res) ->
+        new App(id: 'this-id-is-nogood').services().fetch().then (services) ->
+          assert.equal services.length, 0
+          done()
+
+  it 'Create Service for App', (done) ->
+    request(app)
+      .post('/apps/this-uuid/services')
+      .set(access_token: "qwerty")
+      .set("Content-Type": "application/json;charset=UTF-8")
+      .send('{"name": "redis"}')
+      .expect(200)
+      .end (err, res) ->
+        new App(id: "this-uuid").services().fetch().then (services) ->
+          assert.equal services.models[0].get('name'), 'redis'
+          done()
+
+
+
+
+
+
 
 

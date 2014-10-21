@@ -2,6 +2,8 @@
 (function() {
   var app, auth, bodyParser, express, mod, oauth, server;
 
+  global.uuid = require('node-uuid');
+
   express = require('express');
 
   app = express();
@@ -64,18 +66,53 @@
   app.get("/apps", function(req, res) {
     return new mod.App({
       user_id: req.user.id
-    }).fetchAll().then(function(collection) {
+    }).fetchAll({
+      withRelated: ['services', 'provider_id_secrets']
+    }).then(function(collection) {
       res.send(collection.toJSON());
     });
   });
 
   app.post("/apps", function(req, res) {
     app = new mod.App({
+      id: uuid.v4(),
       name: req.body.name,
       user_id: req.user.id
     });
-    return app.save().then(function() {
+    return app.save(null, {
+      method: "insert"
+    }).then(function() {
       res.send("OK");
+    });
+  });
+
+  app.get("/apps/:id/services", function(req, res) {
+    return new mod.App({
+      id: req.params.id,
+      user_id: req.user.id
+    }).services().fetch().then(function(services) {
+      return res.send(services.toJSON());
+    });
+  });
+
+  app.post("/apps/:id/services", function(req, res) {
+    req.body.name = req.body.name || "redis";
+    return new mod.App({
+      id: req.params.id
+    }).fetch().then(function(app_mod) {
+      if (app_mod === null) {
+        res.status(404).write("App not found");
+        res.send();
+        return;
+      }
+      return new mod.Service({
+        app_id: app_mod.id,
+        name: req.body.name
+      }).save(null, {
+        method: "insert"
+      }).then(function(service) {
+        return res.send(service.toJSON());
+      });
     });
   });
 

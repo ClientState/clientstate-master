@@ -24,7 +24,19 @@
     <!-- Edit existing Apps -->
     <div ng-repeat="app in apps">
       <input ng-model="app.name" />
-    </div>
+      <div ng-repeat="service in app.services">
+      {{ service }}
+      </div>
+      <div class="new-service">
+        <select ng-model="app.new_service_name">
+          <option value="">Redis</option>
+          <option value="postgres">Postgres</option>
+        </select>
+        <button ng-click="create_service(app.new_service_name, app.id)">
+          Launch Service
+        </button>
+      </div>
+    </div><!-- app in apps -->
     <!-- Create a new App -->
     <div id="new-app">
       <input ng-model="newAppName" placeholder="New App Name" />

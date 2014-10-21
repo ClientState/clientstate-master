@@ -1,3 +1,4 @@
+global.uuid = require 'node-uuid'
 express = require 'express'
 app = express()
 oauth = require 'oauth-express'
@@ -50,18 +51,51 @@ app.use auth
 # TODO: handle errors
 app.get "/apps", (req, res) ->
   # list all Apps for User
-  new mod.App(user_id: req.user.id).fetchAll().then (collection) ->
+  new mod.App(
+    user_id: req.user.id
+  ).fetchAll(
+    withRelated: ['services', 'provider_id_secrets']
+  ).then (collection) ->
     res.send collection.toJSON()
     return
 
 app.post "/apps", (req, res) ->
   # create new App for User
   app = new mod.App
+    id: uuid.v4()
     name: req.body.name
     user_id: req.user.id
-  app.save().then () ->
+  app.save(null, method: "insert").then () ->
     res.send "OK"
     return
+
+app.get "/apps/:id/services", (req, res) ->
+  # return services for id/user_id
+  new mod.App(
+    id: req.params.id
+    user_id: req.user.id
+  ).services().fetch().then (services) ->
+    res.send services.toJSON()
+
+app.post "/apps/:id/services", (req, res) ->
+  # create new Service for App
+  # POST JSON with {"name": "redis"}, a address and port will be derived and returned
+  # App must be for req.user
+  req.body.name = req.body.name or "redis"  # hack to get select default
+  new mod.App(id: req.params.id).fetch().then (app_mod) ->
+    if app_mod is null
+      res.status(404).write("App not found")
+      res.send()
+      return
+    new mod.Service(
+      app_id: app_mod.id, name: req.body.name
+    ).save(null, method: "insert").then (service) ->
+      # TODO - magic, spin up service, get address/port, return to client
+      res.send service.toJSON()
+
+
+
+
 
 # app at ENV -- GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET
 # must match the callback url, in this case,

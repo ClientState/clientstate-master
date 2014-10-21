@@ -27,9 +27,17 @@
         return $scope.apps = res;
       });
     };
-    return $scope.create_new_app = function() {
+    $scope.create_new_app = function() {
       return $http.post('/apps', {
         name: $scope.newAppName
+      }).success(function(res) {
+        $scope.newAppName = "";
+        return $scope.get_apps();
+      });
+    };
+    return $scope.create_service = function(name, app_id) {
+      return $http.post("/apps/" + app_id + "/services", {
+        name: name
       }).success(function(res) {
         return $scope.get_apps();
       });
