@@ -5,6 +5,7 @@ models = {
   User
   ProviderLoginDetails
   App
+  ProviderIDSecret
 } = require "../models"
 
 {assert} = require "chai"
@@ -107,7 +108,27 @@ describe 'Services for App', () ->
           assert.equal services.models[0].get('name'), 'redis'
           done()
 
+describe 'ProviderIDSecrets for App', () ->
+  beforeEach createAppForUser
 
+  it 'Create ProviderIDSecret with POST', (done) ->
+    j =
+      client_id: "client_id_asdf"
+      client_secret: "client_secret_asdf"
+      oauth_redirect_url: "http://example.com/auth/github"
+    request(app)
+      .post('/apps/this-uuid/provider-id-secrets')
+      .set(access_token: "qwerty")
+      .set("Content-Type": "application/json;charset=UTF-8")
+      .send(JSON.stringify j)
+      .expect(200)
+      .end (err, res) ->
+        new ProviderIDSecret(id: 1).fetch().then (pis) ->
+          assert.equal pis.get("app_id"), "this-uuid"
+          assert.equal pis.get("client_id"), j.client_id
+          assert.equal pis.get("client_secret"), j.client_secret
+          assert.equal pis.get("oauth_redirect_url"), j.oauth_redirect_url
+          done()
 
 
 

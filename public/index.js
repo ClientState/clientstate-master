@@ -35,10 +35,22 @@
         return $scope.get_apps();
       });
     };
-    return $scope.create_service = function(name, app_id) {
+    $scope.create_service = function(name, app_id) {
       return $http.post("/apps/" + app_id + "/services", {
         name: name
       }).success(function(res) {
+        return $scope.get_apps();
+      });
+    };
+    return $scope.create_pis = function(app) {
+      var d;
+      d = {
+        provider: "github",
+        client_id: app.new_client_id,
+        client_secret: app.new_client_secret,
+        oauth_redirect_url: app.new_oauth_redirect_url
+      };
+      return $http.post("/apps/" + app.id + "/provider-id-secrets", d).then(function(res) {
         return $scope.get_apps();
       });
     };

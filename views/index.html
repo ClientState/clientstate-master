@@ -36,6 +36,18 @@
           Launch Service
         </button>
       </div>
+      <div ng-repeat="pis in app.provider_id_secrets">
+        {{ pis }}
+      </div>
+      <div class="new-provider-id-secret">
+        Only Github is currently supported
+        <input ng-model="app.new_client_id" placeholder="GITHUB_CLIENT_ID">
+        <input ng-model="app.new_client_secret" placeholder="GITHUB_CLIENT_SECRET">
+        <input ng-model="app.new_oauth_redirect_url" placeholder="OAUTH_REDIRECT_URL">
+        <button ng-click="create_pis(app)">
+          Save App Credentials
+        </button>
+      </div>
     </div><!-- app in apps -->
     <!-- Create a new App -->
     <div id="new-app">

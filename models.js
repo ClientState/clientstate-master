@@ -122,6 +122,7 @@
       t.timestamps();
       t.string('client_id');
       t.string('client_secret');
+      t.string('oauth_redirect_url');
       t.string('app_id').references('id').inTable('apps');
     };
 

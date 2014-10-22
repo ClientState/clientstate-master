@@ -36,5 +36,17 @@ CSMController = ($scope, $http) ->
     $http.post("/apps/#{app_id}/services", {name: name}).success (res) ->
       $scope.get_apps()
 
+  $scope.create_pis = (app) ->
+    d =
+      # TODO: support more providers
+      provider: "github"
+      client_id: app.new_client_id
+      client_secret: app.new_client_secret
+      oauth_redirect_url: app.new_oauth_redirect_url
+
+    $http.post("/apps/#{app.id}/provider-id-secrets", d).then (res) ->
+      $scope.get_apps()
+
+
 CSMController.$inject = ['$scope', '$http']
 angular.module('CSMApp').controller 'CSMController', CSMController

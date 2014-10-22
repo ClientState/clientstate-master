@@ -8,6 +8,7 @@
     "body-parser": "^1.9.0",
     "bookshelf": "^0.7.7",
     "chai": "^1.9.2",
+    "dockerode": "^2.0.3",
     "express": "^4.9.7",
     "knex": "^0.7.3",
     "mocha": "^1.21.5",

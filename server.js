@@ -116,6 +116,21 @@
     });
   });
 
+  app.post("/apps/:id/provider-id-secrets", function(req, res) {
+    var PIS;
+    PIS = {
+      app_id: req.params.id,
+      client_id: req.body.client_id,
+      client_secret: req.body.client_secret,
+      oauth_redirect_url: req.body.oauth_redirect_url
+    };
+    return new mod.ProviderIDSecret(PIS).save(null, {
+      method: "insert"
+    }).then(function(pis) {
+      return res.send("Ok");
+    });
+  });
+
   server = app.listen(4000, function() {
     return console.log('Listening on port %d', server.address().port);
   });

@@ -93,9 +93,15 @@ app.post "/apps/:id/services", (req, res) ->
       # TODO - magic, spin up service, get address/port, return to client
       res.send service.toJSON()
 
-
-
-
+app.post "/apps/:id/provider-id-secrets", (req, res) ->
+  # Create PIS for App
+  PIS =
+    app_id: req.params.id
+    client_id: req.body.client_id
+    client_secret: req.body.client_secret
+    oauth_redirect_url: req.body.oauth_redirect_url
+  new mod.ProviderIDSecret(PIS).save(null, method: "insert").then (pis) ->
+    res.send "Ok"
 
 # app at ENV -- GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET
 # must match the callback url, in this case,
