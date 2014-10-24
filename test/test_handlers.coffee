@@ -96,17 +96,21 @@ describe 'Services for App', () ->
           assert.equal services.length, 0
           done()
 
+  # TODO - mock docker!
+  # this runs but it runs against a working docker client ...
+  ###
   it 'Create Service for App', (done) ->
     request(app)
       .post('/apps/this-uuid/services')
       .set(access_token: "qwerty")
       .set("Content-Type": "application/json;charset=UTF-8")
-      .send('{"name": "redis"}')
+      .send('{"type": "redis"}')
       .expect(200)
       .end (err, res) ->
         new App(id: "this-uuid").services().fetch().then (services) ->
-          assert.equal services.models[0].get('name'), 'redis'
+          assert.equal services.models[0].get('type'), 'redis'
           done()
+  ###
 
 describe 'ProviderIDSecrets for App', () ->
   beforeEach createAppForUser

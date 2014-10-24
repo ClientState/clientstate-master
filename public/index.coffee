@@ -18,8 +18,12 @@ CSMController = ($scope, $http) ->
       # TODO - localStorage
       $scope.github_access_token = provider_data.access_token
       $http.defaults.headers.common.access_token = $scope.github_access_token
-      $scope.$apply()
-      $scope.get_apps()
+
+      # TODO, access_token is no good for a second?
+      setTimeout(
+        () -> $scope.get_apps(),
+        100
+      )
     return
 
   $scope.get_apps = () ->
@@ -32,8 +36,9 @@ CSMController = ($scope, $http) ->
       $scope.newAppName = ""
       $scope.get_apps()
 
-  $scope.create_service = (name, app_id) ->
-    $http.post("/apps/#{app_id}/services", {name: name}).success (res) ->
+  $scope.create_service = (type, app_id) ->
+    console.log "create_service", type, app_id
+    $http.post("/apps/#{app_id}/services", {type: type}).success (res) ->
       $scope.get_apps()
 
   $scope.create_pis = (app) ->

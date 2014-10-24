@@ -99,7 +99,7 @@
         access_token: "qwerty"
       }).expect(200).expect('[]', done);
     });
-    it('404 for bad id', function(done) {
+    return it('404 for bad id', function(done) {
       return request(app).post('/apps/this-id-is-nogood/services').set({
         access_token: "qwerty"
       }).set({
@@ -113,20 +113,20 @@
         });
       });
     });
-    return it('Create Service for App', function(done) {
-      return request(app).post('/apps/this-uuid/services').set({
-        access_token: "qwerty"
-      }).set({
-        "Content-Type": "application/json;charset=UTF-8"
-      }).send('{"name": "redis"}').expect(200).end(function(err, res) {
-        return new App({
-          id: "this-uuid"
-        }).services().fetch().then(function(services) {
-          assert.equal(services.models[0].get('name'), 'redis');
-          return done();
-        });
-      });
-    });
+
+    /*
+    it 'Create Service for App', (done) ->
+      request(app)
+        .post('/apps/this-uuid/services')
+        .set(access_token: "qwerty")
+        .set("Content-Type": "application/json;charset=UTF-8")
+        .send('{"type": "redis"}')
+        .expect(200)
+        .end (err, res) ->
+          new App(id: "this-uuid").services().fetch().then (services) ->
+            assert.equal services.models[0].get('type'), 'redis'
+            done()
+     */
   });
 
   describe('ProviderIDSecrets for App', function() {

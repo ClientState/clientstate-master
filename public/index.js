@@ -18,8 +18,9 @@
         }
         $scope.github_access_token = provider_data.access_token;
         $http.defaults.headers.common.access_token = $scope.github_access_token;
-        $scope.$apply();
-        return $scope.get_apps();
+        return setTimeout(function() {
+          return $scope.get_apps();
+        }, 100);
       });
     };
     $scope.get_apps = function() {
@@ -35,9 +36,10 @@
         return $scope.get_apps();
       });
     };
-    $scope.create_service = function(name, app_id) {
+    $scope.create_service = function(type, app_id) {
+      console.log("create_service", type, app_id);
       return $http.post("/apps/" + app_id + "/services", {
-        name: name
+        type: type
       }).success(function(res) {
         return $scope.get_apps();
       });

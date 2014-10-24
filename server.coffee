@@ -26,7 +26,9 @@ auth = (req, res, next) ->
     res.status(403).write "valid access_token header required"
     res.send()
 
+  #console.log req.headers.access_token
   if req.headers.access_token is undefined
+    #console.log "undefined access_token"
     abort()
 
   # TODO: cache access_token - don't hit database
@@ -41,14 +43,10 @@ auth = (req, res, next) ->
       req.user = user
       next()
       return
-    else
-      abort()
-      return
+    abort()
 
 app.use auth
 
-
-# TODO: handle errors
 app.get "/apps", (req, res) ->
   # list all Apps for User
   new mod.App(
@@ -69,6 +67,17 @@ app.post "/apps", (req, res) ->
     res.send "OK"
     return
 
+app.post "/apps/:id/provider-id-secrets", (req, res) ->
+  # Create PIS for App
+  PIS =
+    provider: "github"
+    app_id: req.params.id
+    client_id: req.body.client_id
+    client_secret: req.body.client_secret
+    oauth_redirect_url: req.body.oauth_redirect_url
+  new mod.ProviderIDSecret(PIS).save(null, method: "insert").then (pis) ->
+    res.send "Ok"
+
 app.get "/apps/:id/services", (req, res) ->
   # return services for id/user_id
   new mod.App(
@@ -81,27 +90,21 @@ app.post "/apps/:id/services", (req, res) ->
   # create new Service for App
   # POST JSON with {"name": "redis"}, a address and port will be derived and returned
   # App must be for req.user
-  req.body.name = req.body.name or "redis"  # hack to get select default
-  new mod.App(id: req.params.id).fetch().then (app_mod) ->
+  new mod.App(id: req.params.id).fetch(
+    withRelated: ['provider_id_secrets']
+  ).then (app_mod) ->
+    #console.log "fetched--------------------------", app_mod
     if app_mod is null
       res.status(404).write("App not found")
       res.send()
       return
-    new mod.Service(
-      app_id: app_mod.id, name: req.body.name
-    ).save(null, method: "insert").then (service) ->
-      # TODO - magic, spin up service, get address/port, return to client
-      res.send service.toJSON()
 
-app.post "/apps/:id/provider-id-secrets", (req, res) ->
-  # Create PIS for App
-  PIS =
-    app_id: req.params.id
-    client_id: req.body.client_id
-    client_secret: req.body.client_secret
-    oauth_redirect_url: req.body.oauth_redirect_url
-  new mod.ProviderIDSecret(PIS).save(null, method: "insert").then (pis) ->
-    res.send "Ok"
+    app_mod.create_new_service req.body, (service) ->
+      #console.log "create_new_service callback!!!!!!!!!!!!!!!!!!"
+      res.send service.toJSON()
+      return
+
+
 
 # app at ENV -- GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET
 # must match the callback url, in this case,

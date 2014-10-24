@@ -55,9 +55,9 @@
       if (user) {
         req.user = user;
         next();
-      } else {
-        abort();
+        return;
       }
+      return abort();
     });
   };
 
@@ -86,6 +86,22 @@
     });
   });
 
+  app.post("/apps/:id/provider-id-secrets", function(req, res) {
+    var PIS;
+    PIS = {
+      provider: "github",
+      app_id: req.params.id,
+      client_id: req.body.client_id,
+      client_secret: req.body.client_secret,
+      oauth_redirect_url: req.body.oauth_redirect_url
+    };
+    return new mod.ProviderIDSecret(PIS).save(null, {
+      method: "insert"
+    }).then(function(pis) {
+      return res.send("Ok");
+    });
+  });
+
   app.get("/apps/:id/services", function(req, res) {
     return new mod.App({
       id: req.params.id,
@@ -96,38 +112,19 @@
   });
 
   app.post("/apps/:id/services", function(req, res) {
-    req.body.name = req.body.name || "redis";
     return new mod.App({
       id: req.params.id
-    }).fetch().then(function(app_mod) {
+    }).fetch({
+      withRelated: ['provider_id_secrets']
+    }).then(function(app_mod) {
       if (app_mod === null) {
         res.status(404).write("App not found");
         res.send();
         return;
       }
-      return new mod.Service({
-        app_id: app_mod.id,
-        name: req.body.name
-      }).save(null, {
-        method: "insert"
-      }).then(function(service) {
-        return res.send(service.toJSON());
+      return app_mod.create_new_service(req.body, function(service) {
+        res.send(service.toJSON());
       });
-    });
-  });
-
-  app.post("/apps/:id/provider-id-secrets", function(req, res) {
-    var PIS;
-    PIS = {
-      app_id: req.params.id,
-      client_id: req.body.client_id,
-      client_secret: req.body.client_secret,
-      oauth_redirect_url: req.body.oauth_redirect_url
-    };
-    return new mod.ProviderIDSecret(PIS).save(null, {
-      method: "insert"
-    }).then(function(pis) {
-      return res.send("Ok");
     });
   });
 

@@ -10,6 +10,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=0.48" />
   <title>ClientState</title>
   <!-- <link rel="shortcut icon" href="favicon.ico?v=2309jfaodso"> -->
+<style>
+.app {
+  margin: 1em;
+  padding: 1em;
+  border: 1px solid orange;
+}
+</style>
 </head>
 <body>
 
@@ -22,20 +29,9 @@
 
   <div ng-show="github_access_token">
     <!-- Edit existing Apps -->
-    <div ng-repeat="app in apps">
-      <input ng-model="app.name" />
-      <div ng-repeat="service in app.services">
-      {{ service }}
-      </div>
-      <div class="new-service">
-        <select ng-model="app.new_service_name">
-          <option value="">Redis</option>
-          <option value="postgres">Postgres</option>
-        </select>
-        <button ng-click="create_service(app.new_service_name, app.id)">
-          Launch Service
-        </button>
-      </div>
+    <div class="app" ng-repeat="app in apps">
+      Name: <input ng-model="app.name">
+
       <div ng-repeat="pis in app.provider_id_secrets">
         {{ pis }}
       </div>
@@ -48,10 +44,26 @@
           Save App Credentials
         </button>
       </div>
+
+
+      <div ng-repeat="service in app.services">
+      {{ service }}
+      </div>
+      <div class="new-service">
+        <select ng-model="app.new_service_type">
+          <option value="">Redis</option>
+          <option value="postgres">Postgres</option>
+        </select>
+        <button ng-click="create_service(app.new_service_type, app.id)"
+                ng-disabled="app.provider_id_secrets.length === 0">
+          Launch Service
+        </button>
+      </div>
+
     </div><!-- app in apps -->
     <!-- Create a new App -->
     <div id="new-app">
-      <input ng-model="newAppName" placeholder="New App Name" />
+      <input ng-model="newAppName" placeholder="New App Name">
       <button ng-click="create_new_app()">Create New App</button>
     </div>
   </div>
