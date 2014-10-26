@@ -1,12 +1,12 @@
 require "./conn"
 
+created = 0
+
 for name, Model of require "./models"
-  console.log "create table for", name
+  created += 1
   s = knexion.schema.createTableIfNotExists(
     Model.tableName, Model.createTable
   ).then (a, b, c) ->
-  s.yield()
-
-# TODO - what's a better way to exit after everything is done?
-setTimeout process.exit, 100
-
+    created -= 1
+    if created is 0
+      process.exit()
