@@ -1,7 +1,8 @@
+# global.knexion
 require './conn'
+# global.docker
+require './docker'
 bookshelf = require('bookshelf')(knexion)
-
-docker = require './docker'
 
 
 class User extends bookshelf.Model
@@ -58,10 +59,12 @@ class App extends bookshelf.Model
   create_new_service: (opts, cb) =>
     # opts is object that comes in req.body as JSON
     if (opts.type is "redis") or (opts.type is undefined)
+      opts.type = "redis"
       @_create_redis opts, cb
 
   _create_redis: (opts, cb) =>
-    console.log opts
+    #console.log opts
+
     self = this
     new Service(
       app_id: @id
@@ -137,9 +140,12 @@ class App extends bookshelf.Model
               csContainer.start cs_start_options, (err, data) ->
                 #console.log "cs.start>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", arguments
 
-                cb service
-                return
-
+                csContainer.inspect (err, cscInfo) ->
+                  # write to the DB the details of the 2 containers
+                  service.save_containers rcInfo, cscInfo, () ->
+                    #console.log "SAVED REDIS CONTAINERS"
+                    cb service
+                    return
 
   @tableName = 'apps'
   @createTable = (t) ->
@@ -181,29 +187,61 @@ class Service extends bookshelf.Model
   app: () ->
     @belongsTo App
 
+  containers: () ->
+    @hasMany Container
 
+  save_containers: () =>
+    console.log "save_containers", @
+    # pass in a list of infos that come in from docker inspect
 
+    # TODO
+    # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
+    # You should not slice on arguments
+    # because it prevents optimizations in JavaScript engines (V8 for example).
+    args = Array.prototype.slice.call arguments
+    cb = args[arguments.length - 1]
 
+    containers_left = args.length - 1
+    for container in args.slice(0, -1)
+
+      new Container(
+        id: container.Id
+        service_id: @.id
+        inspect_info: container
+      ).save(null, method: "insert").then () ->
+
+        containers_left -= 1
+        if containers_left is 0
+          cb()
+          return
 
   @tableName = 'services'
   @createTable = (t) ->
     t.increments 'id'
     t.timestamps()
     t.string 'type'  # redis, postgres
-
-    # TODO: divide out into objects?
-    # images, containers, locations to load balancers?
-    # for now, just launch 1 container ...
-    # already, there are two containers for the 1 service
-    # - redis linked to clientstate-redis node app.
-    t.string 'name'
-    t.string 'address'
-    t.string 'port'
-
     t.string('app_id')
       .references('id')
       .inTable('apps')
     return
+
+
+class Container extends bookshelf.Model
+  tableName: 'containers'
+  hasTimestamps: true
+
+  service: () ->
+    @belongsTo Service
+
+  @tableName = 'containers'
+  @createTable = (t) ->
+    # we just store the id and the inspect json?
+    t.string('id').primary()
+    t.timestamps()
+    t.text('inspect_info')
+    t.integer('service_id')
+      .references('id')
+      .inTable('services')
 
 
 global.bookshelf = bookshelf
@@ -212,3 +250,4 @@ module.exports.ProviderLoginDetails = ProviderLoginDetails
 module.exports.App = App
 module.exports.ProviderIDSecret = ProviderIDSecret
 module.exports.Service = Service
+module.exports.Container = Container

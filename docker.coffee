@@ -11,4 +11,4 @@ docker = new Docker
 
 docker.print = () -> console.log(arguments)
 #console.log docker
-module.exports = docker
+global.docker = docker

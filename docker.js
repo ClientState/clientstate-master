@@ -13,6 +13,6 @@
     return console.log(arguments);
   };
 
-  module.exports = docker;
+  global.docker = docker;
 
 }).call(this);

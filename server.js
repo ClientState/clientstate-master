@@ -67,7 +67,7 @@
     return new mod.App({
       user_id: req.user.id
     }).fetchAll({
-      withRelated: ['services', 'provider_id_secrets']
+      withRelated: ['services', 'services.containers', 'provider_id_secrets']
     }).then(function(collection) {
       res.send(collection.toJSON());
     });
@@ -106,7 +106,9 @@
     return new mod.App({
       id: req.params.id,
       user_id: req.user.id
-    }).services().fetch().then(function(services) {
+    }).services({
+      withRelated: ['containers']
+    }).fetch().then(function(services) {
       return res.send(services.toJSON());
     });
   });

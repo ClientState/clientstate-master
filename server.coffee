@@ -52,7 +52,7 @@ app.get "/apps", (req, res) ->
   new mod.App(
     user_id: req.user.id
   ).fetchAll(
-    withRelated: ['services', 'provider_id_secrets']
+    withRelated: ['services', 'services.containers', 'provider_id_secrets']
   ).then (collection) ->
     res.send collection.toJSON()
     return
@@ -83,7 +83,9 @@ app.get "/apps/:id/services", (req, res) ->
   new mod.App(
     id: req.params.id
     user_id: req.user.id
-  ).services().fetch().then (services) ->
+  ).services(
+    withRelated: ['containers']
+  ).fetch().then (services) ->
     res.send services.toJSON()
 
 app.post "/apps/:id/services", (req, res) ->
