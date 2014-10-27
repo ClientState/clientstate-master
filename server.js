@@ -86,6 +86,19 @@
     });
   });
 
+  app.put("/apps/:id", function(req, res) {
+    return new mod.App({
+      id: req.params.id,
+      user_id: req.user.id
+    }).save({
+      name: req.body.name
+    }, {
+      method: "update"
+    }).then(function(app) {
+      res.send("Ok");
+    });
+  });
+
   app.post("/apps/:id/provider-id-secrets", function(req, res) {
     var PIS;
     PIS = {

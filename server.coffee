@@ -67,6 +67,14 @@ app.post "/apps", (req, res) ->
     res.send "OK"
     return
 
+app.put "/apps/:id", (req, res) ->
+  new mod.App(
+    id: req.params.id
+    user_id: req.user.id
+  ).save({name: req.body.name}, {method: "update"}).then (app) ->
+    res.send "Ok"
+    return
+
 app.post "/apps/:id/provider-id-secrets", (req, res) ->
   # Create PIS for App
   PIS =

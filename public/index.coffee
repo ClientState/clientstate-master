@@ -1,12 +1,32 @@
 'use strict'
 
-window.CSMApp = angular.module 'CSMApp', []
+window.CSMApp = angular.module 'CSMApp', ['ngStorage']
+
+CSMApp.filter 'Objectkeys', () ->
+  return (input) ->
+    return Object.keys input
 
 
-CSMController = ($scope, $http) ->
+CSMController = ($scope, $http, $localStorage) ->
   window.scope = $scope
+  $scope.$storage = $localStorage
+  console.log $scope.$storage
 
   $scope.clientid = "b6d50cdc7d9372561081"
+
+  $scope.ack_token = (token) ->
+    $http.defaults.headers.common.access_token = $scope.$storage.github_access_token
+    # TODO, access_token is no good for a second?
+    setTimeout(
+      () -> $scope.get_apps(),
+      1
+    )
+
+  if $scope.$storage.github_access_token?
+    $scope.ack_token $scope.$storage.github_access_token
+
+  $scope.logout = () ->
+    $scope.$storage.github_access_token = undefined
 
   $scope.github_login = () ->
     OAuth.initialize $scope.clientid
@@ -15,26 +35,28 @@ CSMController = ($scope, $http) ->
       console.log err, provider_data
       if err?
         console.log err.stack
-      # TODO - localStorage
-      $scope.github_access_token = provider_data.access_token
-      $http.defaults.headers.common.access_token = $scope.github_access_token
 
-      # TODO, access_token is no good for a second?
-      setTimeout(
-        () -> $scope.get_apps(),
-        100
-      )
+      $scope.$storage.github_access_token = provider_data.access_token
+      $scope.ack_token provider_data.access_token
     return
 
-  $scope.get_apps = () ->
+  $scope.get_apps = (cb = ()->) ->
     $http.get('/apps').success (res) ->
       $scope.apps = res
+      cb()
 
   $scope.create_new_app = () ->
     $http.post('/apps', name: $scope.newAppName).success (res) ->
       # should we just insert into our array without calling over http?
       $scope.newAppName = ""
       $scope.get_apps()
+
+  $scope.save_app = (app) ->
+    # save name change
+    $http.put("/apps/#{app.id}", {name: app.name}).success (res) ->
+      $scope.get_apps () ->
+        # TODO - let's flash some confirmation that things went well.
+        alert "BOOM!"
 
   $scope.create_service = (type, app_id) ->
     console.log "create_service", type, app_id
@@ -53,5 +75,5 @@ CSMController = ($scope, $http) ->
       $scope.get_apps()
 
 
-CSMController.$inject = ['$scope', '$http']
+CSMController.$inject = ['$scope', '$http', '$localStorage']
 angular.module('CSMApp').controller 'CSMController', CSMController

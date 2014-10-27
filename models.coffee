@@ -32,7 +32,7 @@ class ProviderLoginDetails extends bookshelf.Model
     t.string('id').primary()
     t.string 'provider'
     t.string('access_token').index().unique()
-    t.text 'data'
+    t.json 'data'
     t.timestamps()
     t.integer('user_id')
       .unsigned()
@@ -238,7 +238,7 @@ class Container extends bookshelf.Model
     # we just store the id and the inspect json?
     t.string('id').primary()
     t.timestamps()
-    t.text('inspect_info')
+    t.json 'inspect_info'
     t.integer('service_id')
       .references('id')
       .inTable('services')

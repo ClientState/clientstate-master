@@ -3,11 +3,31 @@
   'use strict';
   var CSMController;
 
-  window.CSMApp = angular.module('CSMApp', []);
+  window.CSMApp = angular.module('CSMApp', ['ngStorage']);
 
-  CSMController = function($scope, $http) {
+  CSMApp.filter('Objectkeys', function() {
+    return function(input) {
+      return Object.keys(input);
+    };
+  });
+
+  CSMController = function($scope, $http, $localStorage) {
     window.scope = $scope;
+    $scope.$storage = $localStorage;
+    console.log($scope.$storage);
     $scope.clientid = "b6d50cdc7d9372561081";
+    $scope.ack_token = function(token) {
+      $http.defaults.headers.common.access_token = $scope.$storage.github_access_token;
+      return setTimeout(function() {
+        return $scope.get_apps();
+      }, 1);
+    };
+    if ($scope.$storage.github_access_token != null) {
+      $scope.ack_token($scope.$storage.github_access_token);
+    }
+    $scope.logout = function() {
+      return $scope.$storage.github_access_token = void 0;
+    };
     $scope.github_login = function() {
       OAuth.initialize($scope.clientid);
       OAuth.setOAuthdURL(window.location.origin);
@@ -16,16 +36,17 @@
         if (err != null) {
           console.log(err.stack);
         }
-        $scope.github_access_token = provider_data.access_token;
-        $http.defaults.headers.common.access_token = $scope.github_access_token;
-        return setTimeout(function() {
-          return $scope.get_apps();
-        }, 100);
+        $scope.$storage.github_access_token = provider_data.access_token;
+        return $scope.ack_token(provider_data.access_token);
       });
     };
-    $scope.get_apps = function() {
+    $scope.get_apps = function(cb) {
+      if (cb == null) {
+        cb = function() {};
+      }
       return $http.get('/apps').success(function(res) {
-        return $scope.apps = res;
+        $scope.apps = res;
+        return cb();
       });
     };
     $scope.create_new_app = function() {
@@ -34,6 +55,15 @@
       }).success(function(res) {
         $scope.newAppName = "";
         return $scope.get_apps();
+      });
+    };
+    $scope.save_app = function(app) {
+      return $http.put("/apps/" + app.id, {
+        name: app.name
+      }).success(function(res) {
+        return $scope.get_apps(function() {
+          return alert("BOOM!");
+        });
       });
     };
     $scope.create_service = function(type, app_id) {
@@ -58,7 +88,7 @@
     };
   };
 
-  CSMController.$inject = ['$scope', '$http'];
+  CSMController.$inject = ['$scope', '$http', '$localStorage'];
 
   angular.module('CSMApp').controller('CSMController', CSMController);
 

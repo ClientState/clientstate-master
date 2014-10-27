@@ -58,7 +58,7 @@
       t.string('id').primary();
       t.string('provider');
       t.string('access_token').index().unique();
-      t.text('data');
+      t.json('data');
       t.timestamps();
       t.integer('user_id').unsigned().references('id').inTable('users');
     };
@@ -303,7 +303,7 @@
     Container.createTable = function(t) {
       t.string('id').primary();
       t.timestamps();
-      t.text('inspect_info');
+      t.json('inspect_info');
       return t.integer('service_id').references('id').inTable('services');
     };
 

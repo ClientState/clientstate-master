@@ -3,6 +3,8 @@
 <head>
   <script src="lib/angular/angular.min.js"></script>
   <script src="lib/oauth-js/dist/oauth.js"></script>
+  <script src="lib/ngstorage/ngStorage.min.js"></script>
+
   <script src="public/index.js"></script>
 
   <link rel="stylesheet" type="text/css" href="lib/bootstrap/dist/css/bootstrap.min.css">
@@ -20,20 +22,29 @@
 </head>
 <body>
 
-  <button ng-show="!github_access_token"
+  <button ng-show="!$storage.github_access_token"
           ng-click="github_login()"
           class="btn btn-primary btn-random">
     <!--<img src="img/octocat.png" title="Connect with Github" />-->
     Github Login
   </button>
 
-  <div ng-show="github_access_token">
+  <div ng-show="$storage.github_access_token">
+    <button ng-click="logout()">Logout</button>
+
     <!-- Edit existing Apps -->
     <div class="app" ng-repeat="app in apps">
-      Name: <input ng-model="app.name">
+      Name: <input ng-model="app.name"> <button ng-click="save_app(app)">Save</button>
+      <h6>UUID: {{ app.id }}</h6>
 
+      <h4>Provider Id Secrets</h4>
       <div ng-repeat="pis in app.provider_id_secrets">
-        {{ pis }}
+        {{ pis.provider }}
+        {{ pis.client_id }}
+        {{ pis.client_secret }}
+        {{ pis.oauth_redirect_url }}
+        {{ pis.created_at }}
+        {{ pis.updated_at }}
       </div>
       <div class="new-provider-id-secret">
         Only Github is currently supported
@@ -46,8 +57,23 @@
       </div>
 
 
+      <h4>Services</h4>
       <div ng-repeat="service in app.services">
-      {{ service }}
+        {{ service.type }}
+        {{ service.containers.length }}
+        <div ng-repeat="container in service.containers">
+          {{ container.id }}
+          <!--{{ container.inspect_info.Config.Env }}-->
+
+          {{ container.inspect_info|Objectkeys }}
+
+          {{ container.inspect_info.NetworkSettings }}
+
+
+          <br>
+          <br>
+
+        </div>
       </div>
       <div class="new-service">
         <select ng-model="app.new_service_type">
