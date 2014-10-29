@@ -12,19 +12,14 @@
   });
 
   CSMController = function($scope, $http, $localStorage) {
+    var init;
     window.scope = $scope;
     $scope.$storage = $localStorage;
-    console.log($scope.$storage);
     $scope.clientid = "b6d50cdc7d9372561081";
-    $scope.ack_token = function(token) {
+    $scope.ack_token = function() {
       $http.defaults.headers.common.access_token = $scope.$storage.github_access_token;
-      return setTimeout(function() {
-        return $scope.get_apps();
-      }, 1);
+      return $scope.get_apps();
     };
-    if ($scope.$storage.github_access_token != null) {
-      $scope.ack_token($scope.$storage.github_access_token);
-    }
     $scope.logout = function() {
       return $scope.$storage.github_access_token = void 0;
     };
@@ -32,12 +27,11 @@
       OAuth.initialize($scope.clientid);
       OAuth.setOAuthdURL(window.location.origin);
       OAuth.popup("github", function(err, provider_data) {
-        console.log(err, provider_data);
         if (err != null) {
           console.log(err.stack);
         }
         $scope.$storage.github_access_token = provider_data.access_token;
-        return $scope.ack_token(provider_data.access_token);
+        return $scope.ack_token();
       });
     };
     $scope.get_apps = function(cb) {
@@ -61,9 +55,7 @@
       return $http.put("/apps/" + app.id, {
         name: app.name
       }).success(function(res) {
-        return $scope.get_apps(function() {
-          return alert("BOOM!");
-        });
+        return $scope.get_apps(function() {});
       });
     };
     $scope.create_service = function(type, app_id) {
@@ -74,7 +66,7 @@
         return $scope.get_apps();
       });
     };
-    return $scope.create_pis = function(app) {
+    $scope.create_pis = function(app) {
       var d;
       d = {
         provider: "github",
@@ -86,6 +78,12 @@
         return $scope.get_apps();
       });
     };
+    init = function() {
+      if ($scope.$storage.github_access_token != null) {
+        return $scope.ack_token();
+      }
+    };
+    return init();
   };
 
   CSMController.$inject = ['$scope', '$http', '$localStorage'];

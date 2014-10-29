@@ -10,20 +10,13 @@ CSMApp.filter 'Objectkeys', () ->
 CSMController = ($scope, $http, $localStorage) ->
   window.scope = $scope
   $scope.$storage = $localStorage
-  console.log $scope.$storage
 
   $scope.clientid = "b6d50cdc7d9372561081"
 
-  $scope.ack_token = (token) ->
-    $http.defaults.headers.common.access_token = $scope.$storage.github_access_token
-    # TODO, access_token is no good for a second?
-    setTimeout(
-      () -> $scope.get_apps(),
-      1
-    )
-
-  if $scope.$storage.github_access_token?
-    $scope.ack_token $scope.$storage.github_access_token
+  $scope.ack_token = () ->
+    $http.defaults.headers.common.access_token =
+      $scope.$storage.github_access_token
+    $scope.get_apps()
 
   $scope.logout = () ->
     $scope.$storage.github_access_token = undefined
@@ -32,12 +25,12 @@ CSMController = ($scope, $http, $localStorage) ->
     OAuth.initialize $scope.clientid
     OAuth.setOAuthdURL window.location.origin
     OAuth.popup "github", (err, provider_data) ->
-      console.log err, provider_data
+
       if err?
         console.log err.stack
 
       $scope.$storage.github_access_token = provider_data.access_token
-      $scope.ack_token provider_data.access_token
+      $scope.ack_token()
     return
 
   $scope.get_apps = (cb = ()->) ->
@@ -56,7 +49,7 @@ CSMController = ($scope, $http, $localStorage) ->
     $http.put("/apps/#{app.id}", {name: app.name}).success (res) ->
       $scope.get_apps () ->
         # TODO - let's flash some confirmation that things went well.
-        alert "BOOM!"
+        # alert "BOOM!"
 
   $scope.create_service = (type, app_id) ->
     console.log "create_service", type, app_id
@@ -73,6 +66,11 @@ CSMController = ($scope, $http, $localStorage) ->
 
     $http.post("/apps/#{app.id}/provider-id-secrets", d).then (res) ->
       $scope.get_apps()
+
+  init = () ->
+    if $scope.$storage.github_access_token?
+      $scope.ack_token()
+  init()
 
 
 CSMController.$inject = ['$scope', '$http', '$localStorage']
