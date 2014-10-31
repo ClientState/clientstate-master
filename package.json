@@ -17,7 +17,12 @@
     "pg": "^3.5.0",
     "supertest": "^0.14.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "karma": "^0.12.24",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.1.5",
+    "karma-mocha": "^0.1.9"
+  },
   "scripts": {
     "test": "grunt test"
   },

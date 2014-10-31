@@ -25,6 +25,10 @@
   "dependencies": {
     "oauth-js": "~0.2.4",
     "angular": "~1.2.26",
-    "ngstorage": "~0.3.0"
+    "ngstorage": "~0.3.0",
+    "angular-mocks": "~1.3.0"
+  },
+  "resolutions": {
+    "angular": "1.3.0"
   }
 }
