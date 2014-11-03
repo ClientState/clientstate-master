@@ -20,21 +20,46 @@
     }
   };
 
-  describe('anything', function() {
+  describe('CSMController tests', function() {
     beforeEach(module('CSMApp'));
-    beforeEach(inject(function($controller, $rootScope) {
+    beforeEach(inject(function($controller, $rootScope, _$httpBackend_) {
       var ctrl, scope;
+      window.$httpBackend = _$httpBackend_;
+      $httpBackend.when("GET", "/apps").respond([{}, {}, {}]);
+      $httpBackend.when("POST", "/apps").respond("OK");
       scope = $rootScope.$new();
       return ctrl = $controller('CSMController', {
         $scope: scope
       });
     }));
-    return it('calls OAuth.popup on github login', function(done) {
+    it('github login calls OAuth.popup', function(done) {
       assert.equal(scope.$storage.github_access_token, void 0);
       scope.github_login();
       assert.equal(OAuth.calls.popup, 1);
       assert.equal(scope.$storage.github_access_token, "ABC");
       return done();
+    });
+    it('logout logs out', function(done) {
+      scope.$storage.github_access_token = "foobar";
+      scope.logout();
+      assert.equal(scope.$storage.github_access_token, void 0);
+      return done();
+    });
+    it('makes scope.apps the response of get /apps', function(done) {
+      scope.get_apps(function() {
+        assert.equal(scope.apps.length, 3);
+        return done();
+      });
+      return $httpBackend.flush();
+    });
+    it('post to create_new_app sets newAppName to blank', function(done) {
+      scope.newAppName = "this";
+      scope.create_new_app(function() {
+        assert.equal(scope.newAppName, "");
+        assert.equal(scope.apps.length, 3);
+        return done();
+      });
+      return $httpBackend.flush();
     });
   });
 

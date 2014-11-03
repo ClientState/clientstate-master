@@ -43,12 +43,15 @@
         return cb();
       });
     };
-    $scope.create_new_app = function() {
+    $scope.create_new_app = function(cb) {
+      if (cb == null) {
+        cb = function() {};
+      }
       return $http.post('/apps', {
         name: $scope.newAppName
       }).success(function(res) {
         $scope.newAppName = "";
-        return $scope.get_apps();
+        return $scope.get_apps(cb);
       });
     };
     $scope.save_app = function(app) {
