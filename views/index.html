@@ -18,6 +18,9 @@
   padding: 1em;
   border: 1px solid orange;
 }
+.new-provider-id-secret {
+  margin-top: 1em;
+}
 </style>
 </head>
 <body>
@@ -35,19 +38,33 @@
     <!-- Edit existing Apps -->
     <div class="app" ng-repeat="app in apps">
       Name: <input ng-model="app.name"> <button ng-click="save_app(app)">Save</button>
-      <h6>UUID: {{ app.id }}</h6>
+      <!-- UUID: {{ app.id }} -->
 
-      <h4>Provider Id Secrets</h4>
-      <div ng-repeat="pis in app.provider_id_secrets">
-        {{ pis.provider }}
-        {{ pis.client_id }}
-        {{ pis.client_secret }}
-        {{ pis.oauth_redirect_url }}
-        {{ pis.created_at }}
-        {{ pis.updated_at }}
+      <div ng-show="app.provider_id_secrets.length > 0">
+        <h4>Provider Id Secrets</h4>
+        <table class="table">
+          <tr>
+            <th>Provider</th>
+            <th>Client ID</th>
+            <th>Client Secret</th>
+            <th>Oauth Redirect URL</th>
+            <th>Created</th>
+            <th>Updated</th>
+          <tr ng-repeat="pis in app.provider_id_secrets">
+            <td>{{ pis.provider }}</td>
+            <td>{{ pis.client_id }}</td>
+            <td>{{ pis.client_secret }}</td>
+            <td>{{ pis.oauth_redirect_url }}</td>
+            <td>{{ pis.created_at }}</td>
+            <td>{{ pis.updated_at }}</td>
+          </tr>
+        </table>
       </div>
-      <div class="new-provider-id-secret">
-        Only Github is currently supported
+      <!--
+      TODO: allow only 1 PIS per provider per app
+      so, change a bit when we support multiple providers
+      -->
+      <div class="new-provider-id-secret" ng-show="app.provider_id_secrets.length < 1">
         <input ng-model="app.new_client_id" placeholder="GITHUB_CLIENT_ID">
         <input ng-model="app.new_client_secret" placeholder="GITHUB_CLIENT_SECRET">
         <input ng-model="app.new_oauth_redirect_url" placeholder="OAUTH_REDIRECT_URL">
@@ -57,33 +74,33 @@
       </div>
 
 
-      <h4>Services</h4>
-      <div ng-repeat="service in app.services">
-        {{ service.type }}
-        {{ service.containers.length }}
-        <div ng-repeat="container in service.containers">
-          {{ container.id }}
-          <!--{{ container.inspect_info.Config.Env }}-->
-
-          {{ container.inspect_info|Objectkeys }}
-
-          {{ container.inspect_info.NetworkSettings }}
-
-
-          <br>
-          <br>
-
+      <div ng-show="app.provider_id_secrets.length > 0">
+        <h4>Services</h4>
+        <div ng-repeat="service in app.services">
+          {{ service.type }}
+          <!--
+          {{ service.containers.length }}
+          -->
+          <div ng-repeat="container in service.containers">
+            {{ container.id }}
+            <!--
+            {{ container.inspect_info|Objectkeys }}
+            {{ container.inspect_info.Config.Env }}
+            -->
+            {{ container.inspect_info.NetworkSettings.Ports }}
+            <br>
+          </div>
         </div>
-      </div>
-      <div class="new-service">
-        <select ng-model="app.new_service_type">
-          <option value="">Redis</option>
-          <option value="postgres">Postgres</option>
-        </select>
-        <button ng-click="create_service(app.new_service_type, app.id)"
-                ng-disabled="app.provider_id_secrets.length === 0">
-          Launch Service
-        </button>
+        <div class="new-service">
+          <select ng-model="app.new_service_type">
+            <option value="">Redis</option>
+            <option value="postgres">Postgres</option>
+          </select>
+          <button ng-click="create_service(app.new_service_type, app.id)"
+                  ng-disabled="app.provider_id_secrets.length === 0">
+            Launch Service
+          </button>
+        </div>
       </div>
 
     </div><!-- app in apps -->
