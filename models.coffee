@@ -38,9 +38,9 @@ class ProviderLoginDetails extends bookshelf.Model
       .unsigned()
       .references('id')
       .inTable('users')
-    return
       # .onDelete
       # .onUpdate
+    return
 
 
 class App extends bookshelf.Model
@@ -63,10 +63,9 @@ class App extends bookshelf.Model
       @_create_redis opts, cb
 
   _create_redis: (opts, cb) =>
-    #console.log opts
-
     self = this
     new Service(
+      id: uuid.v4()
       app_id: @id
       type: opts.type
     ).save(null, method: "insert").then (service) ->
@@ -90,31 +89,23 @@ class App extends bookshelf.Model
         },
       }
       docker.createContainer redis_create_options, (err, redisContainer) ->
-        #console.log "@@@@@@@@@@@@@@ createContainer redis", arguments
 
         redis_start_options = {
           "PortBindings": { "6379/tcp": {} },
           "PublishAllPorts": true,
         }
         redisContainer.start redis_start_options, (err, data) ->
-          #console.log "redis start>>>>>>>>>>>>>>>>>>>>>>>>", arguments
 
           # TODO: support more than github
           for pis_mod in self.relations.provider_id_secrets.models
-            #console.log "********"
-            #console.log pis_mod
-            #console.log pis_mod.get "provider"
-            #console.log "********"
 
             if pis_mod.get('provider') is "github"
               GITHUB_CLIENT_ID = pis_mod.get 'client_id'
               GITHUB_CLIENT_SECRET = pis_mod.get 'client_secret'
               OAUTH_REDIRECT_URL = pis_mod.get 'oauth_redirect_url'
-              #console.log GITHUB_CLIENT_SECRET, GITHUB_CLIENT_ID, OAUTH_REDIRECT_URL
               break
 
           redisContainer.inspect (err, rcInfo) ->
-            #console.log rcInfo.Name
             cs_create_options = {
               "Image": "skyl/clientstate-redis"
               "ExposedPorts": {
@@ -127,9 +118,7 @@ class App extends bookshelf.Model
                 "DEBUG=yes"
               ]
             }
-            #console.log cs_create_options.Env
             docker.createContainer cs_create_options, (err, csContainer) ->
-              #console.log "$$$$$$$$$$$ createContainer clientstate-redis", arguments
 
               # add port information to service
               cs_start_options = {
@@ -138,12 +127,10 @@ class App extends bookshelf.Model
                 "PublishAllPorts": true,
               }
               csContainer.start cs_start_options, (err, data) ->
-                #console.log "cs.start>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", arguments
 
                 csContainer.inspect (err, cscInfo) ->
                   # write to the DB the details of the 2 containers
                   service.save_containers rcInfo, cscInfo, () ->
-                    #console.log "SAVED REDIS CONTAINERS"
                     cb service
                     return
 
@@ -191,7 +178,6 @@ class Service extends bookshelf.Model
     @hasMany Container
 
   save_containers: () =>
-    console.log "save_containers", @
     # pass in a list of infos that come in from docker inspect
 
     # TODO
@@ -203,10 +189,9 @@ class Service extends bookshelf.Model
 
     containers_left = args.length - 1
     for container in args.slice(0, -1)
-
       new Container(
         id: container.Id
-        service_id: @.id
+        service_id: @id
         inspect_info: container
       ).save(null, method: "insert").then () ->
 
@@ -217,7 +202,7 @@ class Service extends bookshelf.Model
 
   @tableName = 'services'
   @createTable = (t) ->
-    t.increments 'id'
+    t.string('id').primary()
     t.timestamps()
     t.string 'type'  # redis, postgres
     t.string('app_id')
@@ -239,7 +224,7 @@ class Container extends bookshelf.Model
     t.string('id').primary()
     t.timestamps()
     t.json 'inspect_info'
-    t.integer('service_id')
+    t.string('service_id')
       .references('id')
       .inTable('services')
 

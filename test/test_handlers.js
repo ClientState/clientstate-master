@@ -4,17 +4,13 @@
 
   request = require('supertest');
 
+  assert = require("chai").assert;
+
   app = require('../server').app;
 
   models = (_ref = require("../models"), User = _ref.User, ProviderLoginDetails = _ref.ProviderLoginDetails, App = _ref.App, ProviderIDSecret = _ref.ProviderIDSecret, _ref);
 
-  assert = require("chai").assert;
-
-  global.uuid = {
-    v4: function() {
-      return "other-uuid";
-    }
-  };
+  require("./global_mocks")();
 
   createAppForUser = function(done) {
     var k, v;
@@ -99,7 +95,7 @@
         access_token: "qwerty"
       }).expect(200).expect('[]', done);
     });
-    return it('404 for bad id', function(done) {
+    it('404 for bad id', function(done) {
       return request(app).post('/apps/this-id-is-nogood/services').set({
         access_token: "qwerty"
       }).set({
@@ -113,20 +109,21 @@
         });
       });
     });
-
-    /*
-    it 'Create Service for App', (done) ->
-      request(app)
-        .post('/apps/this-uuid/services')
-        .set(access_token: "qwerty")
-        .set("Content-Type": "application/json;charset=UTF-8")
-        .send('{"type": "redis"}')
-        .expect(200)
-        .end (err, res) ->
-          new App(id: "this-uuid").services().fetch().then (services) ->
-            assert.equal services.models[0].get('type'), 'redis'
-            done()
-     */
+    return it('Create Service for App', function(done) {
+      return request(app).post('/apps/this-uuid/services').set({
+        access_token: "qwerty"
+      }).set({
+        "Content-Type": "application/json;charset=UTF-8"
+      }).send('{"type": "redis"}').expect(200).end(function(err, res) {
+        return new App({
+          id: "this-uuid"
+        }).services().fetch().then(function(services) {
+          assert.equal(services.models[0].get('type'), 'redis');
+          assert.equal(docker.callCounts.createContainer, 2);
+          return done();
+        });
+      });
+    });
   });
 
   describe('ProviderIDSecrets for App', function() {

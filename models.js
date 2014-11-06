@@ -103,6 +103,7 @@
       var self;
       self = this;
       return new Service({
+        id: uuid.v4(),
         app_id: this.id,
         type: opts.type
       }).save(null, {
@@ -246,7 +247,6 @@
 
     Service.prototype.save_containers = function() {
       var args, cb, container, containers_left, _i, _len, _ref, _results;
-      console.log("save_containers", this);
       args = Array.prototype.slice.call(arguments);
       cb = args[arguments.length - 1];
       containers_left = args.length - 1;
@@ -273,7 +273,7 @@
     Service.tableName = 'services';
 
     Service.createTable = function(t) {
-      t.increments('id');
+      t.string('id').primary();
       t.timestamps();
       t.string('type');
       t.string('app_id').references('id').inTable('apps');
@@ -304,7 +304,7 @@
       t.string('id').primary();
       t.timestamps();
       t.json('inspect_info');
-      return t.integer('service_id').references('id').inTable('services');
+      return t.string('service_id').references('id').inTable('services');
     };
 
     return Container;

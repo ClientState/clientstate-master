@@ -1,4 +1,7 @@
 request = require 'supertest'
+{assert} = require "chai"
+
+
 app = require('../server').app
 
 models = {
@@ -8,13 +11,10 @@ models = {
   ProviderIDSecret
 } = require "../models"
 
-{assert} = require "chai"
+# global.uuid
+# global.docker
+require("./global_mocks")()
 
-
-global.uuid = {
-  v4: () ->
-    "other-uuid"
-}
 
 createAppForUser = (done) ->
   knexion.raw(
@@ -96,9 +96,6 @@ describe 'Services for App', () ->
           assert.equal services.length, 0
           done()
 
-  # TODO - mock docker!
-  # this runs but it runs against a working docker client ...
-  ###
   it 'Create Service for App', (done) ->
     request(app)
       .post('/apps/this-uuid/services')
@@ -109,8 +106,9 @@ describe 'Services for App', () ->
       .end (err, res) ->
         new App(id: "this-uuid").services().fetch().then (services) ->
           assert.equal services.models[0].get('type'), 'redis'
+          assert.equal docker.callCounts.createContainer, 2
           done()
-  ###
+
 
 describe 'ProviderIDSecrets for App', () ->
   beforeEach createAppForUser

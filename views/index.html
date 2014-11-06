@@ -38,7 +38,8 @@
     <!-- Edit existing Apps -->
     <div class="app" ng-repeat="app in apps">
       Name: <input ng-model="app.name"> <button ng-click="save_app(app)">Save</button>
-      <!-- UUID: {{ app.id }} -->
+      UUID: {{ app.id }}
+      <!-- Show how to instantiate a client -->
 
       <div ng-show="app.provider_id_secrets.length > 0">
         <h4>Provider Id Secrets</h4>

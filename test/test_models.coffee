@@ -1,12 +1,19 @@
 models = {
   User
+  ProviderIDSecret
   ProviderLoginDetails
+  App
 } = require "../models"
 
 {assert} = require "chai"
 
+# global.uuid
+# global.docker
+require("./global_mocks")()
+
 
 beforeEach (done) ->
+  docker.reset()
   # http://stackoverflow.com/a/18060545/177293
   knexion.raw(
     "TRUNCATE TABLE #{(v.tableName for k,v of models).join(',')} RESTART IDENTITY"
@@ -89,7 +96,24 @@ describe 'Collections', () ->
       done()
 
 
+describe 'create new redis Service', () ->
 
+  beforeEach (done) ->
+    new App(id: uuid.v4()).save(null, method: "insert").then (app) ->
+      new ProviderIDSecret(app_id: app.id).save(null, method: "insert").then (pis) ->
+        done()
+
+  it 'calls docker correctly when app.create redis', (done) ->
+    # console.log uuid.v4()
+    new App(id: "other-uuid").fetch(
+      withRelated: ["provider_id_secrets"]
+    ).then (app) ->
+      opts = {
+        type: "redis"
+      }
+      app.create_new_service opts, () ->
+        assert.equal docker.callCounts.createContainer, 2
+        done()
 
 
 
