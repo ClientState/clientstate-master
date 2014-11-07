@@ -50,11 +50,20 @@ CSMController = ($scope, $http, $localStorage) ->
       $scope.get_apps () ->
         # TODO - let's flash some confirmation that things went well.
         # alert "BOOM!"
+        alert "Successfully Saved!"
 
   $scope.create_service = (type, app_id) ->
-    console.log "create_service", type, app_id
+    #console.log "create_service", type, app_id
     $http.post("/apps/#{app_id}/services", {type: type}).success (res) ->
       $scope.get_apps()
+
+  $scope.delete_service = (service) ->
+    #console.log service
+    $http.delete(
+      "/apps/#{service.app_id}/services/#{service.id}"
+    ).success (res) ->
+      $scope.get_apps()
+
 
   $scope.create_pis = (app) ->
     d =

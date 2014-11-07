@@ -95,7 +95,7 @@
     }, {
       method: "update"
     }).then(function(app) {
-      res.send("Ok");
+      res.send("OK");
     });
   });
 
@@ -111,7 +111,7 @@
     return new mod.ProviderIDSecret(PIS).save(null, {
       method: "insert"
     }).then(function(pis) {
-      return res.send("Ok");
+      return res.send("OK");
     });
   });
 
@@ -128,7 +128,8 @@
 
   app.post("/apps/:id/services", function(req, res) {
     return new mod.App({
-      id: req.params.id
+      id: req.params.id,
+      user_id: req.user.id
     }).fetch({
       withRelated: ['provider_id_secrets']
     }).then(function(app_mod) {
@@ -139,6 +140,26 @@
       }
       return app_mod.create_new_service(req.body, function(service) {
         res.send(service.toJSON());
+      });
+    });
+  });
+
+  app["delete"]("/apps/:app_id/services/:service_id", function(req, res) {
+    return new mod.App({
+      id: req.params.app_id,
+      user_id: req.user.id
+    }).fetch({
+      withRelated: ['services']
+    }).then(function(app_mod) {
+      var service;
+      if (app_mod === null) {
+        res.status(404).write("App not found");
+        res.send();
+        return;
+      }
+      service = app_mod.related('services')._byId[req.params.service_id];
+      return service["delete"](function() {
+        return res.send('OK');
       });
     });
   });

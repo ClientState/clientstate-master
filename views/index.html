@@ -37,12 +37,22 @@
 
     <!-- Edit existing Apps -->
     <div class="app" ng-repeat="app in apps">
-      Name: <input ng-model="app.name"> <button ng-click="save_app(app)">Save</button>
-      UUID: {{ app.id }}
-      <!-- Show how to instantiate a client -->
+      <h1>{{ app.name }}</h1>
+      <table class="table">
+        <tr>
+          <th>Name</th>
+          <th>ID</th>
+          <th>Actions</th>
+        </tr>
+        <tr>
+          <td><input ng-model="app.name"> <button ng-click="save_app(app)">Save</button></td>
+          <td>{{ app.id }}</td>
+          <td>TODO: delete and ....</td>
+        </tr>
+      </table>
 
       <div ng-show="app.provider_id_secrets.length > 0">
-        <h4>Provider Id Secrets</h4>
+        <h3>Provider Id Secrets</h3>
         <table class="table">
           <tr>
             <th>Provider</th>
@@ -75,33 +85,33 @@
       </div>
 
 
-      <div ng-show="app.provider_id_secrets.length > 0">
+      <div ng-show="app.services.length > 0">
         <h4>Services</h4>
-        <div ng-repeat="service in app.services">
-          {{ service.type }}
-          <!--
-          {{ service.containers.length }}
-          -->
-          <div ng-repeat="container in service.containers">
-            {{ container.id }}
-            <!--
-            {{ container.inspect_info|Objectkeys }}
-            {{ container.inspect_info.Config.Env }}
-            -->
-            {{ container.inspect_info.NetworkSettings.Ports }}
-            <br>
-          </div>
-        </div>
-        <div class="new-service">
-          <select ng-model="app.new_service_type">
-            <option value="">Redis</option>
-            <option value="postgres">Postgres</option>
-          </select>
-          <button ng-click="create_service(app.new_service_type, app.id)"
-                  ng-disabled="app.provider_id_secrets.length === 0">
-            Launch Service
-          </button>
-        </div>
+        <table class="table">
+          <tr>
+            <th>Type</th>
+            <th>ID</th>
+            <th>Actions</th>
+          </tr>
+          <tr ng-repeat="service in app.services">
+            <td>{{ service.type }}</td>
+            <td>{{ service.id }}</td>
+            <td>
+              <button ng-click="delete_service(service)">X</button>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="new-service" ng-show="app.provider_id_secrets.length > 0">
+        <select ng-model="app.new_service_type">
+          <option value="">Redis</option>
+          <option value="postgres">Postgres</option>
+        </select>
+        <button ng-click="create_service(app.new_service_type, app.id)"
+                ng-disabled="app.provider_id_secrets.length === 0">
+          Launch New Service
+        </button>
+      </div>
       </div>
 
     </div><!-- app in apps -->

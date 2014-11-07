@@ -72,7 +72,7 @@ app.put "/apps/:id", (req, res) ->
     id: req.params.id
     user_id: req.user.id
   ).save({name: req.body.name}, {method: "update"}).then (app) ->
-    res.send "Ok"
+    res.send "OK"
     return
 
 app.post "/apps/:id/provider-id-secrets", (req, res) ->
@@ -84,7 +84,7 @@ app.post "/apps/:id/provider-id-secrets", (req, res) ->
     client_secret: req.body.client_secret
     oauth_redirect_url: req.body.oauth_redirect_url
   new mod.ProviderIDSecret(PIS).save(null, method: "insert").then (pis) ->
-    res.send "Ok"
+    res.send "OK"
 
 app.get "/apps/:id/services", (req, res) ->
   # return services for id/user_id
@@ -100,20 +100,34 @@ app.post "/apps/:id/services", (req, res) ->
   # create new Service for App
   # POST JSON with {"name": "redis"}, a address and port will be derived and returned
   # App must be for req.user
-  new mod.App(id: req.params.id).fetch(
+  new mod.App(
+    id: req.params.id
+    user_id: req.user.id
+  ).fetch(
     withRelated: ['provider_id_secrets']
   ).then (app_mod) ->
-    #console.log "fetched--------------------------", app_mod
     if app_mod is null
       res.status(404).write("App not found")
       res.send()
       return
-
     app_mod.create_new_service req.body, (service) ->
-      #console.log "create_new_service callback!!!!!!!!!!!!!!!!!!"
       res.send service.toJSON()
       return
 
+app.delete "/apps/:app_id/services/:service_id", (req, res) ->
+  new mod.App(
+    id: req.params.app_id
+    user_id: req.user.id
+  ).fetch(
+    withRelated: ['services']
+  ).then (app_mod) ->
+    if app_mod is null
+      res.status(404).write("App not found")
+      res.send()
+      return
+    service = app_mod.related('services')._byId[req.params.service_id]
+    service.delete () ->
+      res.send 'OK'
 
 
 # app at ENV -- GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET

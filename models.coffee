@@ -130,7 +130,7 @@ class App extends bookshelf.Model
 
                 csContainer.inspect (err, cscInfo) ->
                   # write to the DB the details of the 2 containers
-                  service.save_containers rcInfo, cscInfo, () ->
+                  service.save_containers cscInfo, rcInfo, () ->
                     cb service
                     return
 
@@ -199,6 +199,14 @@ class Service extends bookshelf.Model
         if containers_left is 0
           cb()
           return
+
+  delete: (cb) =>
+    self = @
+    @containers().fetch().then (collection) ->
+      for container in collection.models
+        # TODO! docker.stop, docker.rm
+        container.destroy()
+      self.destroy().then cb
 
   @tableName = 'services'
   @createTable = (t) ->

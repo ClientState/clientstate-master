@@ -169,7 +169,7 @@
                 };
                 return csContainer.start(cs_start_options, function(err, data) {
                   return csContainer.inspect(function(err, cscInfo) {
-                    return service.save_containers(rcInfo, cscInfo, function() {
+                    return service.save_containers(cscInfo, rcInfo, function() {
                       cb(service);
                     });
                   });
@@ -229,6 +229,7 @@
     __extends(Service, _super);
 
     function Service() {
+      this["delete"] = __bind(this["delete"], this);
       this.save_containers = __bind(this.save_containers, this);
       return Service.__super__.constructor.apply(this, arguments);
     }
@@ -268,6 +269,20 @@
         }));
       }
       return _results;
+    };
+
+    Service.prototype["delete"] = function(cb) {
+      var self;
+      self = this;
+      return this.containers().fetch().then(function(collection) {
+        var container, _i, _len, _ref;
+        _ref = collection.models;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          container = _ref[_i];
+          container.destroy();
+        }
+        return self.destroy().then(cb);
+      });
     };
 
     Service.tableName = 'services';

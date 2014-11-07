@@ -58,14 +58,20 @@
       return $http.put("/apps/" + app.id, {
         name: app.name
       }).success(function(res) {
-        return $scope.get_apps(function() {});
+        return $scope.get_apps(function() {
+          return alert("Successfully Saved!");
+        });
       });
     };
     $scope.create_service = function(type, app_id) {
-      console.log("create_service", type, app_id);
       return $http.post("/apps/" + app_id + "/services", {
         type: type
       }).success(function(res) {
+        return $scope.get_apps();
+      });
+    };
+    $scope.delete_service = function(service) {
+      return $http["delete"]("/apps/" + service.app_id + "/services/" + service.id).success(function(res) {
         return $scope.get_apps();
       });
     };
