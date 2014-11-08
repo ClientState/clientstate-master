@@ -20,6 +20,13 @@ class MockContainer
     info = {
       Id: Math.random().toString().substr(2, 5)
       Name: "mock_container"
+      NetworkSettings: {
+        Ports: {
+          '3000/tcp': [
+            {HostIp: '0.0.0.0', HostPort: '49220'}
+          ]
+        }
+      }
     }
     cb null, info
 

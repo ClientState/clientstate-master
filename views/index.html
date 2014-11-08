@@ -116,7 +116,7 @@
 
     </div><!-- app in apps -->
     <!-- Create a new App -->
-    <div id="new-app">
+    <div id="new-app" ng-show="$storage.github_access_token">
       <input ng-model="newAppName" placeholder="New App Name">
       <button ng-click="create_new_app()">Create New App</button>
     </div>

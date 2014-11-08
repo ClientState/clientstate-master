@@ -275,11 +275,14 @@
       var self;
       self = this;
       return this.containers().fetch().then(function(collection) {
-        var container, _i, _len, _ref;
+        var container, dc, _i, _len, _ref;
         _ref = collection.models;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           container = _ref[_i];
-          container.destroy();
+          dc = docker.getContainer(container.id);
+          dc.stop(function() {
+            return dc.remove(function() {});
+          });
         }
         return self.destroy().then(cb);
       });
@@ -319,7 +322,7 @@
       t.string('id').primary();
       t.timestamps();
       t.json('inspect_info');
-      return t.string('service_id').references('id').inTable('services');
+      return t.string('service_id').references('id').inTable('services').onDelete('CASCADE');
     };
 
     return Container;

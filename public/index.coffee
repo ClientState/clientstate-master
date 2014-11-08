@@ -19,7 +19,7 @@ CSMController = ($scope, $http, $localStorage) ->
     $scope.get_apps()
 
   $scope.logout = () ->
-    $scope.$storage.github_access_token = undefined
+    delete $scope.$storage.github_access_token
 
   $scope.github_login = () ->
     OAuth.initialize $scope.clientid
@@ -49,21 +49,8 @@ CSMController = ($scope, $http, $localStorage) ->
     $http.put("/apps/#{app.id}", {name: app.name}).success (res) ->
       $scope.get_apps () ->
         # TODO - let's flash some confirmation that things went well.
-        # alert "BOOM!"
+        # instead of this alert ...
         alert "Successfully Saved!"
-
-  $scope.create_service = (type, app_id) ->
-    #console.log "create_service", type, app_id
-    $http.post("/apps/#{app_id}/services", {type: type}).success (res) ->
-      $scope.get_apps()
-
-  $scope.delete_service = (service) ->
-    #console.log service
-    $http.delete(
-      "/apps/#{service.app_id}/services/#{service.id}"
-    ).success (res) ->
-      $scope.get_apps()
-
 
   $scope.create_pis = (app) ->
     d =
@@ -75,6 +62,17 @@ CSMController = ($scope, $http, $localStorage) ->
 
     $http.post("/apps/#{app.id}/provider-id-secrets", d).then (res) ->
       $scope.get_apps()
+
+  $scope.create_service = (type, app_id) ->
+    $http.post("/apps/#{app_id}/services", {type: type}).success (res) ->
+      $scope.get_apps()
+
+  $scope.delete_service = (service) ->
+    $http.delete(
+      "/apps/#{service.app_id}/services/#{service.id}"
+    ).success (res) ->
+      $scope.get_apps()
+
 
   init = () ->
     if $scope.$storage.github_access_token?

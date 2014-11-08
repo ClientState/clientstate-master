@@ -21,7 +21,7 @@
       return $scope.get_apps();
     };
     $scope.logout = function() {
-      return $scope.$storage.github_access_token = void 0;
+      return delete $scope.$storage.github_access_token;
     };
     $scope.github_login = function() {
       OAuth.initialize($scope.clientid);
@@ -63,18 +63,6 @@
         });
       });
     };
-    $scope.create_service = function(type, app_id) {
-      return $http.post("/apps/" + app_id + "/services", {
-        type: type
-      }).success(function(res) {
-        return $scope.get_apps();
-      });
-    };
-    $scope.delete_service = function(service) {
-      return $http["delete"]("/apps/" + service.app_id + "/services/" + service.id).success(function(res) {
-        return $scope.get_apps();
-      });
-    };
     $scope.create_pis = function(app) {
       var d;
       d = {
@@ -84,6 +72,18 @@
         oauth_redirect_url: app.new_oauth_redirect_url
       };
       return $http.post("/apps/" + app.id + "/provider-id-secrets", d).then(function(res) {
+        return $scope.get_apps();
+      });
+    };
+    $scope.create_service = function(type, app_id) {
+      return $http.post("/apps/" + app_id + "/services", {
+        type: type
+      }).success(function(res) {
+        return $scope.get_apps();
+      });
+    };
+    $scope.delete_service = function(service) {
+      return $http["delete"]("/apps/" + service.app_id + "/services/" + service.id).success(function(res) {
         return $scope.get_apps();
       });
     };

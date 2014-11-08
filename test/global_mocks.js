@@ -26,7 +26,17 @@
       this.callCounts.inspect += 1;
       info = {
         Id: Math.random().toString().substr(2, 5),
-        Name: "mock_container"
+        Name: "mock_container",
+        NetworkSettings: {
+          Ports: {
+            '3000/tcp': [
+              {
+                HostIp: '0.0.0.0',
+                HostPort: '49220'
+              }
+            ]
+          }
+        }
       };
       return cb(null, info);
     };

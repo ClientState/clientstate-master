@@ -18,6 +18,17 @@ app.use "/public", express.static "#{__dirname}/public"
 app.use "/lib", express.static "#{__dirname}/bower_components"
 app.use "/", express.static "#{__dirname}/views"
 
+
+app.get "/services/:id", (req, res) ->
+  # translate a service id into a backend information
+  # this is for nginx to know where to proxy to
+  new mod.Service(id: req.params.id).fetch(
+    withRelated: ['containers']
+  ).then (service) ->
+    # store something on service to let us know what to return here
+    res.send service.port_json
+
+
 # Extract User from access_token header
 # "access_token: OAUTH-TOKEN"
 auth = (req, res, next) ->
@@ -45,7 +56,7 @@ auth = (req, res, next) ->
       return
     abort()
 
-app.use auth
+app.use "/apps", auth
 
 app.get "/apps", (req, res) ->
   # list all Apps for User
@@ -98,7 +109,7 @@ app.get "/apps/:id/services", (req, res) ->
 
 app.post "/apps/:id/services", (req, res) ->
   # create new Service for App
-  # POST JSON with {"name": "redis"}, a address and port will be derived and returned
+  # POST JSON with {"name": "redis"}
   # App must be for req.user
   new mod.App(
     id: req.params.id

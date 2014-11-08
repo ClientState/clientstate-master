@@ -98,7 +98,6 @@ class App extends bookshelf.Model
 
           # TODO: support more than github
           for pis_mod in self.relations.provider_id_secrets.models
-
             if pis_mod.get('provider') is "github"
               GITHUB_CLIENT_ID = pis_mod.get 'client_id'
               GITHUB_CLIENT_SECRET = pis_mod.get 'client_secret'
@@ -127,7 +126,6 @@ class App extends bookshelf.Model
                 "PublishAllPorts": true,
               }
               csContainer.start cs_start_options, (err, data) ->
-
                 csContainer.inspect (err, cscInfo) ->
                   # write to the DB the details of the 2 containers
                   service.save_containers cscInfo, rcInfo, () ->
@@ -204,8 +202,9 @@ class Service extends bookshelf.Model
     self = @
     @containers().fetch().then (collection) ->
       for container in collection.models
-        # TODO! docker.stop, docker.rm
-        container.destroy()
+        dc = docker.getContainer(container.id)
+        dc.stop () ->
+          dc.remove () ->
       self.destroy().then cb
 
   @tableName = 'services'
@@ -235,6 +234,7 @@ class Container extends bookshelf.Model
     t.string('service_id')
       .references('id')
       .inTable('services')
+      .onDelete('CASCADE')
 
 
 global.bookshelf = bookshelf

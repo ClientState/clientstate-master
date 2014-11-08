@@ -32,6 +32,16 @@
 
   app.use("/", express["static"]("" + __dirname + "/views"));
 
+  app.get("/services/:id", function(req, res) {
+    return new mod.Service({
+      id: req.params.id
+    }).fetch({
+      withRelated: ['containers']
+    }).then(function(service) {
+      return res.send(service.port_json);
+    });
+  });
+
   auth = function(req, res, next) {
     var abort;
     abort = function() {
@@ -61,7 +71,7 @@
     });
   };
 
-  app.use(auth);
+  app.use("/apps", auth);
 
   app.get("/apps", function(req, res) {
     return new mod.App({
