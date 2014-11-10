@@ -7,7 +7,7 @@ This is the hub that launches your containers and keeps track of your secrets.
 
 
 Local Hacking
-=============
+-------------
 
 Assuming you have `node` and `npm` installed,
 you can install the dependencies:
@@ -63,11 +63,13 @@ Assuming you have docker installed locally,
 you can now create and remove containers through the webUI.
 
 To customize the location of the docker API,
-you should be able to set DOCKERODE_HOST and DOCKERODE_PORT
+you should be able to set DOCKER_PORT_4444_TCP_ADDR (127.0.0.1 is default)
+and DOCKER_PORT_4444_TCP_PORT (2375 is default).
+(TODO- 4444. wat?)
 
 
 Run in Containers
-=================
+-----------------
 
 Assumes you can call `docker version` from your command line with success.
 
@@ -109,5 +111,3 @@ open a terminal and create/reset the schema
 
 Now, you should be able to go to http://172.17.8.101:4000/
 and create/destroy some clientstate-redis containers
-
-
