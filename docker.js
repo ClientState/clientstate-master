@@ -5,8 +5,8 @@
   Docker = require('dockerode');
 
   docker = new Docker({
-    host: process.env.DOCKERODE_HOST || '127.0.0.1',
-    port: process.env.DOCKERODE_PORT || 2375
+    host: process.env.DOCKER_PORT_4444_TCP_ADDR || '127.0.0.1',
+    port: process.env.DOCKER_PORT_4444_TCP_PORT || 2375
   });
 
   docker.print = function() {

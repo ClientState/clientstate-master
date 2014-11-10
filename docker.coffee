@@ -1,8 +1,9 @@
 Docker = require 'dockerode'
 
 docker = new Docker
-  host: process.env.DOCKERODE_HOST or '127.0.0.1'
-  port: process.env.DOCKERODE_PORT or 2375
+  # TODO: don't hardcode 4444 in here; hrm.
+  host: process.env.DOCKER_PORT_4444_TCP_ADDR or '127.0.0.1'
+  port: process.env.DOCKER_PORT_4444_TCP_PORT or 2375
   #ca: fs.readFileSync('ca.pem'),
   #cert: fs.readFileSync('cert.pem'),
   #key: fs.readFileSync('key.pem')

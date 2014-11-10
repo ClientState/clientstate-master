@@ -1,3 +1,6 @@
-dropdb csm
-createdb csm
+export PG_PORT_5432_TCP_ADDR=${PG_PORT_5432_TCP_ADDR:="127.0.0.1"}
+export PG_PORT_5432_TCP_PORT=${PG_PORT_5432_TCP_PORT:="5432"}
+export PG_USER=${PG_USER:=$USER}
+dropdb -h $PG_PORT_5432_TCP_ADDR -p $PG_PORT_5432_TCP_PORT -U $PG_USER csm
+createdb -h $PG_PORT_5432_TCP_ADDR -p $PG_PORT_5432_TCP_PORT -U $PG_USER csm
 node ./create_schema.js

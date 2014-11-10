@@ -5,10 +5,10 @@
   knexion = require('knex')({
     client: 'postgres',
     connection: {
-      host: '127.0.0.1',
-      user: process.env.PG_USER,
-      password: process.env.PG_PASSWORD,
-      database: process.env.PG_DATABASE || "csm",
+      host: process.env.PG_PORT_5432_TCP_ADDR || '127.0.0.1',
+      user: process.env.USER || 'postgres',
+      password: process.env.PG_PASSWORD || '',
+      database: process.env.PG_DATABASE || 'csm',
       charset: 'utf8'
     }
   });

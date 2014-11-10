@@ -146,5 +146,6 @@ app.delete "/apps/:app_id/services/:service_id", (req, res) ->
 # http://localhost:4000/auth_callback/github
 server = app.listen 4000, () ->
   console.log 'Listening on port %d', server.address().port
+  # console.log process.env
 
 module.exports.app = app

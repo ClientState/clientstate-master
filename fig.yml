@@ -1,0 +1,30 @@
+csm:
+  build: .
+  environment:
+    GITHUB_CLIENT_ID:
+    GITHUB_CLIENT_SECRET:
+    OAUTH_REDIRECT_URL:
+  command: node server.js
+  ports:
+   - "4000:4000"
+  links:
+   - pg
+   - docker
+
+pg:
+  image: postgres
+
+docker:
+  image: jpetazzo/dind
+  privileged: true
+  # TODO - this shares images with the child docker
+  # but, the containers ... it's a little wonky.
+  # should just pull redis and clientstate-redis
+  # into this container instead of relying on the
+  # parent docker having these?
+  volumes:
+   - /var/lib/docker:/var/lib/docker
+  ports:
+   - "4444:4444"
+  environment:
+   PORT: 4444
