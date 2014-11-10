@@ -11,5 +11,5 @@ docker = new Docker
 #docker = new Docker(host: '127.0.0.1', port: 2375)  #, protocol: 'tcp')
 
 docker.print = () -> console.log(arguments)
-#console.log docker
+
 global.docker = docker

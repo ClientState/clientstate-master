@@ -1,15 +1,26 @@
+nginx:
+  # volumes with vagrant are wtf.
+  # so, we add the confs in the dockerfile
+  build: ./docker/nginx/
+  ports:
+    - "80:80"
+    - "443:443"
+  links:
+    - csm
+
 csm:
   build: .
   environment:
     GITHUB_CLIENT_ID:
     GITHUB_CLIENT_SECRET:
     OAUTH_REDIRECT_URL:
+    PG_USER: postgres
   command: node server.js
   ports:
-   - "4000:4000"
+    - "4000:4000"
   links:
-   - pg
-   - docker
+    - pg
+    - docker
 
 pg:
   image: postgres
@@ -23,8 +34,8 @@ docker:
   # into this container instead of relying on the
   # parent docker having these?
   volumes:
-   - /var/lib/docker:/var/lib/docker
+    - /var/lib/docker:/var/lib/docker
   ports:
-   - "4444:4444"
+    - "4444:4444"
   environment:
    PORT: 4444

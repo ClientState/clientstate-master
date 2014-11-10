@@ -2,9 +2,10 @@ FROM node
 # Debian GNU/Linux jessie/sid
 MAINTAINER Skylar Saveland
 
+RUN apt-get install -y postgresql-client
+
 ADD . /src
 WORKDIR /src
-RUN apt-get install -y postgresql-client
 RUN npm install
 
 EXPOSE 4000

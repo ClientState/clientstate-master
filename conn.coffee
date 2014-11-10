@@ -1,6 +1,7 @@
 knexion = require('knex')
   client: 'postgres'
   connection:
+    # TODO: default port is always ok? hrm.
     host: process.env.PG_PORT_5432_TCP_ADDR or '127.0.0.1'
     # taking advantage of no $USER on container ..
     user: process.env.USER or 'postgres'

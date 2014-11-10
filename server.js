@@ -51,9 +51,9 @@
     if (req.headers.access_token === void 0) {
       abort();
     }
-    return (new mod.ProviderLoginDetails({
+    return new mod.ProviderLoginDetails({
       access_token: req.headers.access_token
-    })).fetch({
+    }).fetch({
       withRelated: ['user']
     }).then(function(pld) {
       var user;
@@ -175,7 +175,8 @@
   });
 
   server = app.listen(4000, function() {
-    return console.log('Listening on port %d', server.address().port);
+    console.log('Listening on port %d', server.address().port);
+    return console.log(process.env);
   });
 
   module.exports.app = app;

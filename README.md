@@ -94,20 +94,10 @@ Run the containers:
 
     fig up
 
-In a separate terminal,
-start a container,
-open a terminal and create/reset the schema
+In a separate terminal, start a container and create/reset the schema
 (TODO- automate):
 
-    $ fig run csm /bin/bash
-    root@9619c01d242c:/src# PG_USER=postgres ./reset_schema.sh
-    dropdb: database removal failed: ERROR:  database "csm" does not exist
-    User created
-    App created
-    ProviderLoginDetails created
-    ProviderIDSecret created
-    Service created
-    Container created
+    fig run csm bash reset_schema.sh
 
 Now, you should be able to go to http://172.17.8.101:4000/
 and create/destroy some clientstate-redis containers

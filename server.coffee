@@ -30,6 +30,7 @@ app.get "/services/:id", (req, res) ->
 
 
 # Extract User from access_token header
+# `access_token` is not a standard header name, but I like it.
 # "access_token: OAUTH-TOKEN"
 auth = (req, res, next) ->
 
@@ -43,8 +44,8 @@ auth = (req, res, next) ->
     abort()
 
   # TODO: cache access_token - don't hit database
-  (new mod.ProviderLoginDetails(
-    access_token: req.headers.access_token)
+  new mod.ProviderLoginDetails(
+    access_token: req.headers.access_token
   ).fetch(withRelated: ['user']).then (pld) ->
     if pld is null
       abort()
@@ -146,6 +147,6 @@ app.delete "/apps/:app_id/services/:service_id", (req, res) ->
 # http://localhost:4000/auth_callback/github
 server = app.listen 4000, () ->
   console.log 'Listening on port %d', server.address().port
-  # console.log process.env
+  console.log process.env
 
 module.exports.app = app

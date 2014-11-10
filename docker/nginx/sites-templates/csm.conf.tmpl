@@ -1,0 +1,19 @@
+# in case we need to debug, for real
+# log_format shorty '$remote_addr - $http_access_token';
+# error_log /dev/stdout info;
+# access_log /dev/stdout shorty;
+
+underscores_in_headers on;
+
+server {
+
+  listen       80;
+  server_name  csm;
+
+  location / {
+    proxy_pass http://${CSM_PORT_4000_TCP_ADDR}:${CSM_PORT_4000_TCP_PORT};
+    # proxy_set_header access_token $http_access_token;
+    # proxy_pass_header access_token;
+    proxy_pass_request_headers on;
+  }
+}
