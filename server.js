@@ -38,7 +38,9 @@
     }).fetch({
       withRelated: ['containers']
     }).then(function(service) {
-      return res.send(service.port_json);
+      return service.proxy_to(function(info) {
+        return res.send(info);
+      });
     });
   });
 
@@ -175,8 +177,7 @@
   });
 
   server = app.listen(4000, function() {
-    console.log('Listening on port %d', server.address().port);
-    return console.log(process.env);
+    return console.log('Listening on port %d', server.address().port);
   });
 
   module.exports.app = app;

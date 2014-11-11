@@ -93,8 +93,8 @@
     };
 
     App.prototype.create_new_service = function(opts, cb) {
-      if ((opts.type === "redis") || (opts.type === void 0)) {
-        opts.type = "redis";
+      if ((opts.type === "clientstate-redis") || (opts.type === void 0)) {
+        opts.type = "clientstate-redis";
         return this._create_redis(opts, cb);
       }
     };
@@ -229,6 +229,7 @@
     __extends(Service, _super);
 
     function Service() {
+      this.proxy_to = __bind(this.proxy_to, this);
       this["delete"] = __bind(this["delete"], this);
       this.save_containers = __bind(this.save_containers, this);
       return Service.__super__.constructor.apply(this, arguments);
@@ -286,6 +287,35 @@
         }
         return self.destroy().then(cb);
       });
+    };
+
+    Service.prototype.type_map = {
+      "clientstate-redis": "skyl/clientstate-redis"
+    };
+
+    Service.prototype.proxy_to = function(cb) {
+      var self;
+      self = this;
+      return this.containers().fetch().then(function(collection) {
+        var container, ii, _i, _len, _ref;
+        _ref = collection.models;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          container = _ref[_i];
+          ii = container.get("inspect_info");
+          if (ii.Config.Image === self.type_map[self.get('type')]) {
+            cb("" + ii.NetworkSettings.IPAddress + ":" + (self.port()));
+            return;
+          }
+        }
+      });
+    };
+
+    Service.prototype.type_to_port = {
+      "clientstate-redis": "3000"
+    };
+
+    Service.prototype.port = function() {
+      return this.type_to_port[this.get('type')];
     };
 
     Service.tableName = 'services';

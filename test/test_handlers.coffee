@@ -101,11 +101,12 @@ describe 'Services for App', () ->
       .post('/apps/this-uuid/services')
       .set(access_token: "qwerty")
       .set("Content-Type": "application/json;charset=UTF-8")
-      .send('{"type": "redis"}')
+      # type sent in here is important
+      .send('{"type": "clientstate-redis"}')
       .expect(200)
       .end (err, res) ->
         new App(id: "this-uuid").services().fetch().then (services) ->
-          assert.equal services.models[0].get('type'), 'redis'
+          assert.equal services.models[0].get('type'), 'clientstate-redis'
           assert.equal docker.callCounts.createContainer, 2
           done()
 

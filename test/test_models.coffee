@@ -109,7 +109,7 @@ describe 'create new redis Service', () ->
       withRelated: ["provider_id_secrets"]
     ).then (app) ->
       opts = {
-        type: "redis"
+        type: "clientstate-redis"
       }
       app.create_new_service opts, () ->
         assert.equal docker.callCounts.createContainer, 2

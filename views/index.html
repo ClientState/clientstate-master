@@ -104,8 +104,9 @@
       </div>
       <div class="new-service" ng-show="app.provider_id_secrets.length > 0">
         <select ng-model="app.new_service_type">
+          <!-- empty makes redis the default value -->
           <option value="">Redis</option>
-          <option value="postgres">Postgres</option>
+          <option value="clientstate-postgres">Postgres</option>
         </select>
         <button ng-click="create_service(app.new_service_type, app.id)"
                 ng-disabled="app.provider_id_secrets.length === 0">

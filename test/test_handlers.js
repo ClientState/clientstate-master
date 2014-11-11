@@ -114,11 +114,11 @@
         access_token: "qwerty"
       }).set({
         "Content-Type": "application/json;charset=UTF-8"
-      }).send('{"type": "redis"}').expect(200).end(function(err, res) {
+      }).send('{"type": "clientstate-redis"}').expect(200).end(function(err, res) {
         return new App({
           id: "this-uuid"
         }).services().fetch().then(function(services) {
-          assert.equal(services.models[0].get('type'), 'redis');
+          assert.equal(services.models[0].get('type'), 'clientstate-redis');
           assert.equal(docker.callCounts.createContainer, 2);
           return done();
         });

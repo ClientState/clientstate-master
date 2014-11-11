@@ -58,8 +58,8 @@ class App extends bookshelf.Model
 
   create_new_service: (opts, cb) =>
     # opts is object that comes in req.body as JSON
-    if (opts.type is "redis") or (opts.type is undefined)
-      opts.type = "redis"
+    if (opts.type is "clientstate-redis") or (opts.type is undefined)
+      opts.type = "clientstate-redis"
       @_create_redis opts, cb
 
   _create_redis: (opts, cb) =>
@@ -207,11 +207,31 @@ class Service extends bookshelf.Model
           dc.remove () ->
       self.destroy().then cb
 
+  # map the service.type to the Image that is launched
+  type_map: {
+    "clientstate-redis": "skyl/clientstate-redis"
+  }
+  proxy_to: (cb) =>
+    self = this
+    @containers().fetch().then (collection) ->
+      # find the container of type
+      for container in collection.models
+        ii = container.get "inspect_info"
+        if ii.Config.Image is self.type_map[self.get 'type']
+          cb "#{ii.NetworkSettings.IPAddress}:#{self.port()}"
+          return
+
+  type_to_port: {
+    "clientstate-redis": "3000"
+  }
+  port: () ->
+    @type_to_port[@get 'type']
+
   @tableName = 'services'
   @createTable = (t) ->
     t.string('id').primary()
     t.timestamps()
-    t.string 'type'  # redis, postgres
+    t.string 'type'  # clientstate-redis, clientstate-postgres
     t.string('app_id')
       .references('id')
       .inTable('apps')

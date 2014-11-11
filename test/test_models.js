@@ -163,7 +163,7 @@
       }).then(function(app) {
         var opts;
         opts = {
-          type: "redis"
+          type: "clientstate-redis"
         };
         return app.create_new_service(opts, function() {
           assert.equal(docker.callCounts.createContainer, 2);

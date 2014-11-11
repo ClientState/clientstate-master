@@ -26,7 +26,8 @@ app.get "/services/:id", (req, res) ->
     withRelated: ['containers']
   ).then (service) ->
     # store something on service to let us know what to return here
-    res.send service.port_json
+    service.proxy_to (info) ->
+      res.send info
 
 
 # Extract User from access_token header
@@ -147,6 +148,6 @@ app.delete "/apps/:app_id/services/:service_id", (req, res) ->
 # http://localhost:4000/auth_callback/github
 server = app.listen 4000, () ->
   console.log 'Listening on port %d', server.address().port
-  console.log process.env
+  #console.log process.env
 
 module.exports.app = app
