@@ -7,6 +7,7 @@ nginx:
     - "443:443"
   links:
     - csm
+    - docker
 
 csm:
   build: .
@@ -37,5 +38,7 @@ docker:
     - /var/lib/docker:/var/lib/docker
   ports:
     - "4444:4444"
+  #expose:
+  #  - "49000-50000"
   environment:
-   PORT: 4444
+    PORT: 4444
