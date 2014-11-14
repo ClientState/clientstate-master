@@ -76,9 +76,9 @@
       so, change a bit when we support multiple providers
       -->
       <div class="new-provider-id-secret" ng-show="app.provider_id_secrets.length < 1">
-        <input ng-model="app.new_client_id" placeholder="GITHUB_CLIENT_ID">
-        <input ng-model="app.new_client_secret" placeholder="GITHUB_CLIENT_SECRET">
-        <input ng-model="app.new_oauth_redirect_url" placeholder="OAUTH_REDIRECT_URL">
+        <input class="form-control" ng-model="app.new_client_id" placeholder="GITHUB_CLIENT_ID">
+        <input class="form-control" ng-model="app.new_client_secret" placeholder="GITHUB_CLIENT_SECRET">
+        <input class="form-control" ng-model="app.new_oauth_redirect_url" placeholder="OAUTH_REDIRECT_URL">
         <button ng-click="create_pis(app)">
           Save App Credentials
         </button>

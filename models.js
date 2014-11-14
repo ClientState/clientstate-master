@@ -134,8 +134,7 @@
           redis_start_options = {
             "PortBindings": {
               "6379/tcp": {}
-            },
-            "PublishAllPorts": true
+            }
           };
           return redisContainer.start(redis_start_options, function(err, data) {
             var GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, OAUTH_REDIRECT_URL, pis_mod, _i, _len, _ref;
@@ -164,8 +163,7 @@
                   "Links": ["" + rcInfo.Name + ":redis"],
                   "PortBindings": {
                     "3000/tcp": {}
-                  },
-                  "PublishAllPorts": true
+                  }
                 };
                 return csContainer.start(cs_start_options, function(err, data) {
                   return csContainer.inspect(function(err, cscInfo) {

@@ -92,7 +92,7 @@ class App extends bookshelf.Model
 
         redis_start_options = {
           "PortBindings": { "6379/tcp": {} },
-          "PublishAllPorts": true,
+          #"PublishAllPorts": true,
         }
         redisContainer.start redis_start_options, (err, data) ->
 
@@ -123,7 +123,7 @@ class App extends bookshelf.Model
               cs_start_options = {
                 "Links": ["#{rcInfo.Name}:redis"],
                 "PortBindings": {"3000/tcp": {}},
-                "PublishAllPorts": true,
+                #"PublishAllPorts": true,
               }
               csContainer.start cs_start_options, (err, data) ->
                 csContainer.inspect (err, cscInfo) ->
