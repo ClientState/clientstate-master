@@ -4,27 +4,6 @@
 
   require("./conn");
 
-
-  /*
-  created = 0
-  
-  for name, Model of require "./models"
-  
-    f = () ->
-      console.log "created table for #{name}"
-      created += 1
-      s = knexion.schema.createTableIfNotExists(
-        Model.tableName, Model.createTable
-      ).then (a, b, c) ->
-        created -= 1
-        console.log created
-        if created is 0
-          process.exit()
-      .catch (err) ->
-        console.log 'err!', created
-        console.log arguments
-   */
-
   m = require("./models");
 
   c = function(model) {
@@ -40,11 +19,8 @@
     });
     return c(m.App).then(function() {
       l("App created");
-      c(m.ProviderIDSecret).then(function() {
-        return l("ProviderIDSecret created");
-      });
-      return c(m.Service).then(function() {
-        l("Service created");
+      return c(m.ProviderIDSecret).then(function() {
+        l("ProviderIDSecret created");
         return c(m.Container).then(function() {
           l("Container created");
           return process.exit();

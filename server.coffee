@@ -19,15 +19,15 @@ app.use "/lib", express.static "#{__dirname}/bower_components"
 app.use "/", express.static "#{__dirname}/views"
 
 
-app.get "/services/:id", (req, res) ->
-  # translate a service id into a backend information
+app.get "/backends/:id", (req, res) ->
+  # translate a app id into a backend IP
   # this is for nginx to know where to proxy to
-  new mod.Service(id: req.params.id).fetch(
+  new mod.App(id: req.params.id).fetch(
     withRelated: ['containers']
-  ).then (service) ->
+  ).then (app) ->
     # store something on service to let us know what to return here
-    service.proxy_to (info) ->
-      res.send info
+    app.proxy_to (backend) ->
+      res.send backend
 
 
 # Extract User from access_token header
@@ -65,7 +65,7 @@ app.get "/apps", (req, res) ->
   new mod.App(
     user_id: req.user.id
   ).fetchAll(
-    withRelated: ['services', 'services.containers', 'provider_id_secrets']
+    withRelated: ['containers', 'provider_id_secrets']
   ).then (collection) ->
     res.send collection.toJSON()
     return
@@ -99,20 +99,8 @@ app.post "/apps/:id/provider-id-secrets", (req, res) ->
   new mod.ProviderIDSecret(PIS).save(null, method: "insert").then (pis) ->
     res.send "OK"
 
-app.get "/apps/:id/services", (req, res) ->
-  # return services for id/user_id
-  new mod.App(
-    id: req.params.id
-    user_id: req.user.id
-  ).services(
-    withRelated: ['containers']
-  ).fetch().then (services) ->
-    res.send services.toJSON()
-
-app.post "/apps/:id/services", (req, res) ->
-  # create new Service for App
-  # POST JSON with {"name": "redis"}
-  # App must be for req.user
+app.post "/apps/:id/launch", (req, res) ->
+  # create containers for App
   new mod.App(
     id: req.params.id
     user_id: req.user.id
@@ -123,24 +111,10 @@ app.post "/apps/:id/services", (req, res) ->
       res.status(404).write("App not found")
       res.send()
       return
-    app_mod.create_new_service req.body, (service) ->
+    # req.body could have options
+    app_mod.launch_service req.body, (service) ->
       res.send service.toJSON()
       return
-
-app.delete "/apps/:app_id/services/:service_id", (req, res) ->
-  new mod.App(
-    id: req.params.app_id
-    user_id: req.user.id
-  ).fetch(
-    withRelated: ['services']
-  ).then (app_mod) ->
-    if app_mod is null
-      res.status(404).write("App not found")
-      res.send()
-      return
-    service = app_mod.related('services')._byId[req.params.service_id]
-    service.delete () ->
-      res.send 'OK'
 
 
 # app at ENV -- GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET

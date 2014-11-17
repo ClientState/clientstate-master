@@ -1,19 +1,68 @@
 # in case we need to debug, for real
-# log_format shorty '$remote_addr - $http_access_token';
-# error_log /dev/stdout info;
-# access_log /dev/stdout shorty;
+log_format shorty 'RA: $remote_addr - HH: $http_host';
+error_log /dev/stdout info;
+access_log /dev/stdout shorty;
+
 
 underscores_in_headers on;
 
 server {
 
-  listen       80;
-  server_name  csm;
+  # TODO: listen only on 443, redirect from 80, testing cert?
+  # listen       80;
+  server_name  ${CSM_SERVER_NAME};
 
   location / {
     proxy_pass http://${CSM_PORT_4000_TCP_ADDR}:${CSM_PORT_4000_TCP_PORT};
-    # proxy_set_header access_token $http_access_token;
-    # proxy_pass_header access_token;
     proxy_pass_request_headers on;
   }
+}
+
+server {
+  # ??????????????????????????????????????????????
+  # de.sign.
+  server_name ~^(?<clientid>.+)\.${CSM_SERVER_NAME};
+  server_name api.${CSM_SERVER_NAME};
+
+  location / {
+
+    # Given the serviceid header,
+    # ask clientstate-master where the backend is
+    # and then proxy to there
+
+
+
+    if ($request_method = 'OPTIONS') {
+      add_header 'Access-Control-Allow-Origin' '*';
+      #
+      # Om nom nom cookies
+      #
+      add_header 'Access-Control-Allow-Credentials' 'true';
+      add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+      #
+      # Custom headers and headers various browsers *should* be OK with but aren't
+      #
+      add_header 'Access-Control-Allow-Headers' 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+      #
+      # Tell client that this pre-flight info is valid for 20 days
+      #
+      add_header 'Access-Control-Max-Age' 1728000;
+      add_header 'Content-Type' 'text/plain charset=UTF-8';
+      add_header 'Content-Length' 0;
+      return 204;
+    }
+    if ($request_method = 'POST') {
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Credentials' 'true';
+      add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+      add_header 'Access-Control-Allow-Headers' 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+    }
+    if ($request_method = 'GET') {
+      add_header 'Access-Control-Allow-Origin' '*';
+      add_header 'Access-Control-Allow-Credentials' 'true';
+      add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+      add_header 'Access-Control-Allow-Headers' 'DNT,X-Mx-ReqToken,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+    }
+  }
+
 }

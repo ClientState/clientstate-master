@@ -76,43 +76,24 @@
       so, change a bit when we support multiple providers
       -->
       <div class="new-provider-id-secret" ng-show="app.provider_id_secrets.length < 1">
-        <input ng-model="app.new_client_id" placeholder="GITHUB_CLIENT_ID">
-        <input ng-model="app.new_client_secret" placeholder="GITHUB_CLIENT_SECRET">
-        <input ng-model="app.new_oauth_redirect_url" placeholder="OAUTH_REDIRECT_URL">
+        <input class="form-control" ng-model="app.new_client_id" placeholder="GITHUB_CLIENT_ID">
+        <input class="form-control" ng-model="app.new_client_secret" placeholder="GITHUB_CLIENT_SECRET">
+        <input class="form-control" ng-model="app.new_oauth_redirect_url" placeholder="OAUTH_REDIRECT_URL">
         <button ng-click="create_pis(app)">
           Save App Credentials
         </button>
       </div>
 
 
-      <div ng-show="app.services.length > 0">
-        <h4>Services</h4>
-        <table class="table">
-          <tr>
-            <th>Type</th>
-            <th>ID</th>
-            <th>Actions</th>
-          </tr>
-          <tr ng-repeat="service in app.services">
-            <td>{{ service.type }}</td>
-            <td>{{ service.id }}</td>
-            <td>
-              <button ng-click="delete_service(service)">X</button>
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="new-service" ng-show="app.provider_id_secrets.length > 0">
-        <select ng-model="app.new_service_type">
-          <!-- empty makes redis the default value -->
-          <option value="">Redis</option>
-          <option value="clientstate-postgres">Postgres</option>
-        </select>
-        <button ng-click="create_service(app.new_service_type, app.id)"
-                ng-disabled="app.provider_id_secrets.length === 0">
-          Launch New Service
-        </button>
-      </div>
+      <div ng-show="app.provider_id_secrets.length > 0">
+        <div ng-show="app.containers.length > 0">
+          LAUNCHED!
+        </div>
+        <div ng-show="app.containers.length == 0">
+          <button ng-click="launch_service(app.id)">
+            Launch!
+          </button>
+        </div>
       </div>
 
     </div><!-- app in apps -->
@@ -121,7 +102,7 @@
       <input ng-model="newAppName" placeholder="New App Name">
       <button ng-click="create_new_app()">Create New App</button>
     </div>
-  </div>
+  </div><!-- logged in - $storage.github_access_token -->
 
 
 </body>

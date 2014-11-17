@@ -50,87 +50,123 @@ class App extends bookshelf.Model
   user: () ->
     @belongsTo User
 
-  services: () ->
-    @hasMany Service
+  containers: () ->
+    @hasMany Container
 
   provider_id_secrets: () ->
     @hasMany ProviderIDSecret
 
-  create_new_service: (opts, cb) =>
-    # opts is object that comes in req.body as JSON
-    if (opts.type is "clientstate-redis") or (opts.type is undefined)
-      opts.type = "clientstate-redis"
-      @_create_redis opts, cb
-
-  _create_redis: (opts, cb) =>
+  # opts are now theoretical
+  # req.body is passed straight in
+  launch_service: (opts, cb) =>
     self = this
-    new Service(
-      id: uuid.v4()
-      app_id: @id
-      type: opts.type
-    ).save(null, method: "insert").then (service) ->
-      ###
-      # Assume that we have an images named
-      #     skyl/clientstate-redis
-      #     redis images
-      # can build from the submodule - docker/clientstate-redis
-      # Assume we have a docker client instantiated with Env variables
-      #
-      # Run redis and link to skyl/clientstate-redis
-      #
-      # https://docs.docker.com/reference/api/docker_remote_api_v1.15/#create-a-container
-      # https://docs.docker.com/reference/api/docker_remote_api_v1.15/#start-a-container
-      ###
+    ###
+    # Assume that we have an images named
+    #     skyl/clientstate-redis
+    #     redis images
+    # can build from the submodule - docker/clientstate-redis
+    # Assume we have a docker client instantiated with Env variables
+    #
+    # Run redis and link to skyl/clientstate-redis
+    #
+    # https://docs.docker.com/reference/api/docker_remote_api_v1.15/
+    ###
 
-      redis_create_options = {
-        "Image": "redis",
-        "ExposedPorts": {
-          "6379/tcp": {}
-        },
+    redis_create_options = {
+      "Image": "redis",
+      "ExposedPorts": {
+        "6379/tcp": {}
+      },
+    }
+    docker.createContainer redis_create_options, (err, redisContainer) ->
+
+      redis_start_options = {
+        "PortBindings": { "6379/tcp": {} },
+        #"PublishAllPorts": true,
       }
-      docker.createContainer redis_create_options, (err, redisContainer) ->
+      redisContainer.start redis_start_options, (err, data) ->
 
-        redis_start_options = {
-          "PortBindings": { "6379/tcp": {} },
-          "PublishAllPorts": true,
-        }
-        redisContainer.start redis_start_options, (err, data) ->
+        # TODO: support more than github
+        for pis_mod in self.relations.provider_id_secrets.models
+          if pis_mod.get('provider') is "github"
+            GITHUB_CLIENT_ID = pis_mod.get 'client_id'
+            GITHUB_CLIENT_SECRET = pis_mod.get 'client_secret'
+            OAUTH_REDIRECT_URL = pis_mod.get 'oauth_redirect_url'
+            break
 
-          # TODO: support more than github
-          for pis_mod in self.relations.provider_id_secrets.models
-            if pis_mod.get('provider') is "github"
-              GITHUB_CLIENT_ID = pis_mod.get 'client_id'
-              GITHUB_CLIENT_SECRET = pis_mod.get 'client_secret'
-              OAUTH_REDIRECT_URL = pis_mod.get 'oauth_redirect_url'
-              break
-
-          redisContainer.inspect (err, rcInfo) ->
-            cs_create_options = {
-              "Image": "skyl/clientstate-redis"
-              "ExposedPorts": {
-                "3000/tcp": {}
-              }
-              Env: [
-                "GITHUB_CLIENT_ID=#{GITHUB_CLIENT_ID}"
-                "GITHUB_CLIENT_SECRET=#{GITHUB_CLIENT_SECRET}"
-                "OAUTH_REDIRECT_URL=#{OAUTH_REDIRECT_URL}"
-                "DEBUG=yes"
-              ]
+        redisContainer.inspect (err, rcInfo) ->
+          cs_create_options = {
+            "Image": "skyl/clientstate-redis"
+            "ExposedPorts": {
+              "3000/tcp": {}
             }
-            docker.createContainer cs_create_options, (err, csContainer) ->
+            Env: [
+              "GITHUB_CLIENT_ID=#{GITHUB_CLIENT_ID}"
+              "GITHUB_CLIENT_SECRET=#{GITHUB_CLIENT_SECRET}"
+              "OAUTH_REDIRECT_URL=#{OAUTH_REDIRECT_URL}"
+              "DEBUG=yes"
+            ]
+          }
+          docker.createContainer cs_create_options, (err, csContainer) ->
 
-              # add port information to service
-              cs_start_options = {
-                "Links": ["#{rcInfo.Name}:redis"],
-                "PortBindings": {"3000/tcp": {}},
-                "PublishAllPorts": true,
-              }
-              csContainer.start cs_start_options, (err, data) ->
-                csContainer.inspect (err, cscInfo) ->
-                  # write to the DB the details of the 2 containers
-                  service.save_containers cscInfo, rcInfo, () ->
-                    cb service
-                    return
+            # add port information to service
+            cs_start_options = {
+              "Links": ["#{rcInfo.Name}:redis"],
+              "PortBindings": {"3000/tcp": {}},
+              #"PublishAllPorts": true,
+            }
+            csContainer.start cs_start_options, (err, data) ->
+              csContainer.inspect (err, cscInfo) ->
+                # write to the DB the details of the 2 containers
+                self.save_containers cscInfo, rcInfo, () ->
+                  cb self
+                  return
+
+  save_containers: () =>
+    # pass in a list of infos that come in from docker inspect
+
+    # TODO
+    # https://developer.mozilla.org/en-US/docs
+    # /Web/JavaScript/Reference/Functions/arguments
+    # You should not slice on arguments
+    # because it prevents optimizations in JavaScript engines (V8 for example).
+    args = Array.prototype.slice.call arguments
+    cb = args[arguments.length - 1]
+
+    containers_left = args.length - 1
+    for container in args.slice(0, -1)
+      new Container(
+        id: container.Id
+        app_id: @id
+        inspect_info: container
+      ).save(null, method: "insert").then () ->
+
+        containers_left -= 1
+        if containers_left is 0
+          cb()
+          return
+
+  delete: (cb) =>
+    self = @
+    @containers().fetch().then (collection) ->
+      for container in collection.models
+        dc = docker.getContainer(container.id)
+        dc.stop () ->
+          dc.remove () ->
+      self.destroy().then cb
+
+  # Each App has one "clientstate-service" backend
+  proxy_to: (cb) =>
+    self = this
+    @containers().fetch().then (collection) ->
+      # find the container of type
+      for container in collection.models
+        ii = container.get "inspect_info"
+        # other containers are supporting
+        # TODO: rename to clientstate-service?
+        if ii.Config.Image is "skyl/clientstate-redis"
+          cb "#{ii.NetworkSettings.IPAddress}:3000"
+          return
 
   @tableName = 'apps'
   @createTable = (t) ->
@@ -162,79 +198,7 @@ class ProviderIDSecret extends bookshelf.Model
     t.string('app_id')
       .references('id')
       .inTable('apps')
-    return
-
-
-class Service extends bookshelf.Model
-  tableName: 'services'
-  hasTimestamps: true
-
-  app: () ->
-    @belongsTo App
-
-  containers: () ->
-    @hasMany Container
-
-  save_containers: () =>
-    # pass in a list of infos that come in from docker inspect
-
-    # TODO
-    # https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
-    # You should not slice on arguments
-    # because it prevents optimizations in JavaScript engines (V8 for example).
-    args = Array.prototype.slice.call arguments
-    cb = args[arguments.length - 1]
-
-    containers_left = args.length - 1
-    for container in args.slice(0, -1)
-      new Container(
-        id: container.Id
-        service_id: @id
-        inspect_info: container
-      ).save(null, method: "insert").then () ->
-
-        containers_left -= 1
-        if containers_left is 0
-          cb()
-          return
-
-  delete: (cb) =>
-    self = @
-    @containers().fetch().then (collection) ->
-      for container in collection.models
-        dc = docker.getContainer(container.id)
-        dc.stop () ->
-          dc.remove () ->
-      self.destroy().then cb
-
-  # map the service.type to the Image that is launched
-  type_map: {
-    "clientstate-redis": "skyl/clientstate-redis"
-  }
-  proxy_to: (cb) =>
-    self = this
-    @containers().fetch().then (collection) ->
-      # find the container of type
-      for container in collection.models
-        ii = container.get "inspect_info"
-        if ii.Config.Image is self.type_map[self.get 'type']
-          cb "#{ii.NetworkSettings.IPAddress}:#{self.port()}"
-          return
-
-  type_to_port: {
-    "clientstate-redis": "3000"
-  }
-  port: () ->
-    @type_to_port[@get 'type']
-
-  @tableName = 'services'
-  @createTable = (t) ->
-    t.string('id').primary()
-    t.timestamps()
-    t.string 'type'  # clientstate-redis, clientstate-postgres
-    t.string('app_id')
-      .references('id')
-      .inTable('apps')
+      .onDelete('CASCADE')
     return
 
 
@@ -242,19 +206,19 @@ class Container extends bookshelf.Model
   tableName: 'containers'
   hasTimestamps: true
 
-  service: () ->
-    @belongsTo Service
+  app: () ->
+    @belongsTo App
 
   @tableName = 'containers'
   @createTable = (t) ->
-    # we just store the id and the inspect json?
     t.string('id').primary()
     t.timestamps()
     t.json 'inspect_info'
-    t.string('service_id')
+    t.string('app_id')
       .references('id')
-      .inTable('services')
+      .inTable('apps')
       .onDelete('CASCADE')
+    return
 
 
 global.bookshelf = bookshelf
@@ -262,5 +226,5 @@ module.exports.User = User
 module.exports.ProviderLoginDetails = ProviderLoginDetails
 module.exports.App = App
 module.exports.ProviderIDSecret = ProviderIDSecret
-module.exports.Service = Service
+#module.exports.Service = Service
 module.exports.Container = Container

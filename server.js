@@ -32,14 +32,14 @@
 
   app.use("/", express["static"]("" + __dirname + "/views"));
 
-  app.get("/services/:id", function(req, res) {
-    return new mod.Service({
+  app.get("/backends/:id", function(req, res) {
+    return new mod.App({
       id: req.params.id
     }).fetch({
       withRelated: ['containers']
-    }).then(function(service) {
-      return service.proxy_to(function(info) {
-        return res.send(info);
+    }).then(function(app) {
+      return app.proxy_to(function(backend) {
+        return res.send(backend);
       });
     });
   });
@@ -79,7 +79,7 @@
     return new mod.App({
       user_id: req.user.id
     }).fetchAll({
-      withRelated: ['services', 'services.containers', 'provider_id_secrets']
+      withRelated: ['containers', 'provider_id_secrets']
     }).then(function(collection) {
       res.send(collection.toJSON());
     });
@@ -127,18 +127,7 @@
     });
   });
 
-  app.get("/apps/:id/services", function(req, res) {
-    return new mod.App({
-      id: req.params.id,
-      user_id: req.user.id
-    }).services({
-      withRelated: ['containers']
-    }).fetch().then(function(services) {
-      return res.send(services.toJSON());
-    });
-  });
-
-  app.post("/apps/:id/services", function(req, res) {
+  app.post("/apps/:id/launch", function(req, res) {
     return new mod.App({
       id: req.params.id,
       user_id: req.user.id
@@ -150,28 +139,8 @@
         res.send();
         return;
       }
-      return app_mod.create_new_service(req.body, function(service) {
+      return app_mod.launch_service(req.body, function(service) {
         res.send(service.toJSON());
-      });
-    });
-  });
-
-  app["delete"]("/apps/:app_id/services/:service_id", function(req, res) {
-    return new mod.App({
-      id: req.params.app_id,
-      user_id: req.user.id
-    }).fetch({
-      withRelated: ['services']
-    }).then(function(app_mod) {
-      var service;
-      if (app_mod === null) {
-        res.status(404).write("App not found");
-        res.send();
-        return;
-      }
-      service = app_mod.related('services')._byId[req.params.service_id];
-      return service["delete"](function() {
-        return res.send('OK');
       });
     });
   });

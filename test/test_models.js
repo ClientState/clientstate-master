@@ -155,17 +155,15 @@
         });
       });
     });
-    return it('calls docker correctly when app.create redis', function(done) {
+    return it('calls docker correctly when app.launch_service', function(done) {
       return new App({
         id: "other-uuid"
       }).fetch({
         withRelated: ["provider_id_secrets"]
       }).then(function(app) {
         var opts;
-        opts = {
-          type: "clientstate-redis"
-        };
-        return app.create_new_service(opts, function() {
+        opts = {};
+        return app.launch_service(opts, function() {
           assert.equal(docker.callCounts.createContainer, 2);
           return done();
         });

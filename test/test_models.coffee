@@ -103,15 +103,13 @@ describe 'create new redis Service', () ->
       new ProviderIDSecret(app_id: app.id).save(null, method: "insert").then (pis) ->
         done()
 
-  it 'calls docker correctly when app.create redis', (done) ->
+  it 'calls docker correctly when app.launch_service', (done) ->
     # console.log uuid.v4()
     new App(id: "other-uuid").fetch(
       withRelated: ["provider_id_secrets"]
     ).then (app) ->
-      opts = {
-        type: "clientstate-redis"
-      }
-      app.create_new_service opts, () ->
+      opts = {}
+      app.launch_service opts, () ->
         assert.equal docker.callCounts.createContainer, 2
         done()
 

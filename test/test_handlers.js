@@ -90,35 +90,16 @@
 
   describe('Services for App', function() {
     beforeEach(createAppForUser);
-    it('empty list of Services for App', function(done) {
-      return request(app).get('/apps/1/services').set({
-        access_token: "qwerty"
-      }).expect(200).expect('[]', done);
-    });
-    it('404 for bad id', function(done) {
-      return request(app).post('/apps/this-id-is-nogood/services').set({
-        access_token: "qwerty"
-      }).set({
-        "Content-Type": "application/json;charset=UTF-8"
-      }).send('{"name": "redis"}').expect(404).end(function(err, res) {
-        return new App({
-          id: 'this-id-is-nogood'
-        }).services().fetch().then(function(services) {
-          assert.equal(services.length, 0);
-          return done();
-        });
-      });
-    });
     return it('Create Service for App', function(done) {
-      return request(app).post('/apps/this-uuid/services').set({
+      return request(app).post('/apps/this-uuid/launch').set({
         access_token: "qwerty"
       }).set({
         "Content-Type": "application/json;charset=UTF-8"
-      }).send('{"type": "clientstate-redis"}').expect(200).end(function(err, res) {
+      }).send('').expect(200).end(function(err, res) {
         return new App({
           id: "this-uuid"
-        }).services().fetch().then(function(services) {
-          assert.equal(services.models[0].get('type'), 'clientstate-redis');
+        }).containers().fetch().then(function(collection) {
+          assert.equal(collection.models.length, 2);
           assert.equal(docker.callCounts.createContainer, 2);
           return done();
         });

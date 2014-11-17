@@ -75,15 +75,8 @@
         return $scope.get_apps();
       });
     };
-    $scope.create_service = function(type, app_id) {
-      return $http.post("/apps/" + app_id + "/services", {
-        type: type
-      }).success(function(res) {
-        return $scope.get_apps();
-      });
-    };
-    $scope.delete_service = function(service) {
-      return $http["delete"]("/apps/" + service.app_id + "/services/" + service.id).success(function(res) {
+    $scope.launch_service = function(app_id) {
+      return $http.post("/apps/" + app_id + "/launch").success(function(res) {
         return $scope.get_apps();
       });
     };

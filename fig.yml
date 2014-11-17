@@ -1,6 +1,8 @@
 nginx:
   # volumes with vagrant are wtf.
   # so, we add the confs in the dockerfile
+  environment:
+    CSM_SERVER_NAME:
   build: ./docker/nginx/
   ports:
     - "80:80"
