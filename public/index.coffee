@@ -11,7 +11,8 @@ CSMController = ($scope, $http, $localStorage) ->
   window.scope = $scope
   $scope.$storage = $localStorage
 
-  $scope.clientid = "b6d50cdc7d9372561081"
+  $scope.github_clientid = "b6d50cdc7d9372561081"
+  $scope.facebook_clientid = "827971890600150"
 
   $scope.ack_token = () ->
     $http.defaults.headers.common.access_token =
@@ -21,14 +22,23 @@ CSMController = ($scope, $http, $localStorage) ->
   $scope.logout = () ->
     delete $scope.$storage.github_access_token
 
-  $scope.github_login = () ->
-    OAuth.initialize $scope.clientid
+  $scope.facebook_login = () ->
+    OAuth.initialize $scope.facebook_clientid
     OAuth.setOAuthdURL window.location.origin
-    OAuth.popup "github", (err, provider_data) ->
-
+    OAuth.popup "facebook", (err, provider_data) ->
+      console.log provider_data
       if err?
         console.log err.stack
+      $scope.$storage.facebook_access_token = provider_data.access_token
+      $scope.ack_token()
+    return
 
+  $scope.github_login = () ->
+    OAuth.initialize $scope.github_clientid
+    OAuth.setOAuthdURL window.location.origin
+    OAuth.popup "github", (err, provider_data) ->
+      if err?
+        console.log err.stack
       $scope.$storage.github_access_token = provider_data.access_token
       $scope.ack_token()
     return

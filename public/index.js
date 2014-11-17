@@ -15,7 +15,8 @@
     var init;
     window.scope = $scope;
     $scope.$storage = $localStorage;
-    $scope.clientid = "b6d50cdc7d9372561081";
+    $scope.github_clientid = "b6d50cdc7d9372561081";
+    $scope.facebook_clientid = "827971890600150";
     $scope.ack_token = function() {
       $http.defaults.headers.common.access_token = $scope.$storage.github_access_token;
       return $scope.get_apps();
@@ -23,8 +24,20 @@
     $scope.logout = function() {
       return delete $scope.$storage.github_access_token;
     };
+    $scope.facebook_login = function() {
+      OAuth.initialize($scope.facebook_clientid);
+      OAuth.setOAuthdURL(window.location.origin);
+      OAuth.popup("facebook", function(err, provider_data) {
+        console.log(provider_data);
+        if (err != null) {
+          console.log(err.stack);
+        }
+        $scope.$storage.facebook_access_token = provider_data.access_token;
+        return $scope.ack_token();
+      });
+    };
     $scope.github_login = function() {
-      OAuth.initialize($scope.clientid);
+      OAuth.initialize($scope.github_clientid);
       OAuth.setOAuthdURL(window.location.origin);
       OAuth.popup("github", function(err, provider_data) {
         if (err != null) {

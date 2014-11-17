@@ -25,10 +25,15 @@
 </head>
 <body>
 
+  <button ng-show="!$storage.facebook_access_token"
+          ng-click="facebook_login()"
+          class="btn btn-primary">
+    Facebook Login
+  </button>
+
   <button ng-show="!$storage.github_access_token"
           ng-click="github_login()"
           class="btn btn-primary btn-random">
-    <!--<img src="img/octocat.png" title="Connect with Github" />-->
     Github Login
   </button>
 
@@ -45,7 +50,10 @@
           <th>Actions</th>
         </tr>
         <tr>
-          <td><input ng-model="app.name"> <button ng-click="save_app(app)">Save</button></td>
+          <td>
+            <input ng-model="app.name">
+            <button ng-click="save_app(app)">Save</button>
+          </td>
           <td>{{ app.id }}</td>
           <td>TODO: delete and ....</td>
         </tr>
