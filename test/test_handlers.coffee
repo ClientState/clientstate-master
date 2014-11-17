@@ -77,36 +77,17 @@ describe 'Create new App for User', () ->
 
 describe 'Services for App', () ->
   beforeEach createAppForUser
-  it 'empty list of Services for App', (done) ->
-    request(app)
-      .get('/apps/1/services')
-      .set(access_token: "qwerty")
-      .expect(200)
-      .expect('[]', done)
-
-  it '404 for bad id', (done) ->
-    request(app)
-      .post('/apps/this-id-is-nogood/services')
-      .set(access_token: "qwerty")
-      .set("Content-Type": "application/json;charset=UTF-8")
-      .send('{"name": "redis"}')
-      .expect(404)
-      .end (err, res) ->
-        new App(id: 'this-id-is-nogood').services().fetch().then (services) ->
-          assert.equal services.length, 0
-          done()
 
   it 'Create Service for App', (done) ->
     request(app)
-      .post('/apps/this-uuid/services')
+      .post('/apps/this-uuid/launch')
       .set(access_token: "qwerty")
       .set("Content-Type": "application/json;charset=UTF-8")
-      # type sent in here is important
-      .send('{"type": "clientstate-redis"}')
+      .send('')
       .expect(200)
       .end (err, res) ->
-        new App(id: "this-uuid").services().fetch().then (services) ->
-          assert.equal services.models[0].get('type'), 'clientstate-redis'
+        new App(id: "this-uuid").containers().fetch().then (collection) ->
+          assert.equal collection.models.length, 2
           assert.equal docker.callCounts.createContainer, 2
           done()
 
@@ -132,9 +113,4 @@ describe 'ProviderIDSecrets for App', () ->
           assert.equal pis.get("client_secret"), j.client_secret
           assert.equal pis.get("oauth_redirect_url"), j.oauth_redirect_url
           done()
-
-
-
-
-
 

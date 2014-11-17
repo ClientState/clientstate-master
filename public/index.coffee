@@ -16,6 +16,7 @@ CSMController = ($scope, $http, $localStorage) ->
   $scope.ack_token = () ->
     $http.defaults.headers.common.access_token =
       $scope.$storage.github_access_token
+    # TODO: on first access, /apps is forbidden, race condition
     $scope.get_apps()
 
   $scope.logout = () ->
@@ -63,14 +64,8 @@ CSMController = ($scope, $http, $localStorage) ->
     $http.post("/apps/#{app.id}/provider-id-secrets", d).then (res) ->
       $scope.get_apps()
 
-  $scope.create_service = (type, app_id) ->
-    $http.post("/apps/#{app_id}/services", {type: type}).success (res) ->
-      $scope.get_apps()
-
-  $scope.delete_service = (service) ->
-    $http.delete(
-      "/apps/#{service.app_id}/services/#{service.id}"
-    ).success (res) ->
+  $scope.launch_service = (app_id) ->
+    $http.post("/apps/#{app_id}/launch").success (res) ->
       $scope.get_apps()
 
 
