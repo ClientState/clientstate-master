@@ -219,5 +219,4 @@ module.exports.User = User
 module.exports.ProviderLoginDetails = ProviderLoginDetails
 module.exports.App = App
 module.exports.ProviderIDSecret = ProviderIDSecret
-#module.exports.Service = Service
 module.exports.Container = Container

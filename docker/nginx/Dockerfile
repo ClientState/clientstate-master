@@ -1,3 +1,3 @@
-FROM shepmaster/nginx-template-image
+FROM tenstartups/openresty
 
-ADD ./sites-templates /etc/nginx/sites-templates
+ADD ./csm.conf /etc/nginx/nginx.conf
