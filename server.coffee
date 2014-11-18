@@ -20,6 +20,7 @@ app.use "/lib", express.static "#{__dirname}/bower_components"
 app.use "/", express.static "#{__dirname}/views"
 
 # map appid to backend
+# this should be done in nginx/lua directly
 app.get "/backends/:id", (req, res) ->
   redis_client.get req.params.id, (err, redis_result) ->
     res.send redis_result
