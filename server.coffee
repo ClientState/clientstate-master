@@ -2,6 +2,7 @@ global.uuid = require 'node-uuid'
 express = require 'express'
 app = express()
 oauth = require 'oauth-express'
+# global.redis_client
 mod = require './models'
 
 bodyParser = require 'body-parser'
@@ -18,16 +19,10 @@ app.use "/public", express.static "#{__dirname}/public"
 app.use "/lib", express.static "#{__dirname}/bower_components"
 app.use "/", express.static "#{__dirname}/views"
 
-
+# map appid to backend
 app.get "/backends/:id", (req, res) ->
-  # translate a app id into a backend IP
-  # this is for nginx to know where to proxy to
-  new mod.App(id: req.params.id).fetch(
-    withRelated: ['containers']
-  ).then (app) ->
-    # store something on service to let us know what to return here
-    app.proxy_to (backend) ->
-      res.send backend
+  redis_client.get req.params.id, (err, redis_result) ->
+    res.send redis_result
 
 
 # Extract User from access_token header
@@ -112,8 +107,8 @@ app.post "/apps/:id/launch", (req, res) ->
       res.send()
       return
     # req.body could have options
-    app_mod.launch_service req.body, (service) ->
-      res.send service.toJSON()
+    app_mod.launch_service req.body, (app) ->
+      res.send app.toJSON()
       return
 
 

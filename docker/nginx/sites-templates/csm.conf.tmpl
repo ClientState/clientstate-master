@@ -1,5 +1,5 @@
 # in case we need to debug, for real
-log_format shorty 'RA: $remote_addr - HH: $http_host';
+log_format shorty 'RA: $remote_addr - HH: $http_host - APPID: $appid';
 error_log /dev/stdout info;
 access_log /dev/stdout shorty;
 
@@ -19,10 +19,7 @@ server {
 }
 
 server {
-  # ??????????????????????????????????????????????
-  # de.sign.
-  server_name ~^(?<clientid>.+)\.${CSM_SERVER_NAME};
-  server_name api.${CSM_SERVER_NAME};
+  server_name ~^(?<appid>.+)\.${CSM_SERVER_NAME};
 
   location / {
 

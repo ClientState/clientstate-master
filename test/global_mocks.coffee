@@ -46,8 +46,23 @@ class MockDocker
       @callCounts[k] = 0
 
 
-docker = new MockDocker()
+class MockRedisClient
+
+  callCounts: {
+    set: 0
+    get: 0
+  }
+
+  set: (key, value, cb=()->) ->
+    @callCounts.set += 1
+    cb()
+
+  get: (key) ->
+    @callCounts.get += 1
+    cb 'XXX.X.X.X:YYYY'
+
 
 module.exports = () ->
   global.uuid = uuid
-  global.docker = docker
+  global.docker = new MockDocker()
+  global.redis_client = new MockRedisClient()

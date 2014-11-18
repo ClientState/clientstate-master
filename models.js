@@ -7,6 +7,8 @@
 
   require('./conn');
 
+  require('./redis_conf');
+
   require('./docker');
 
   bookshelf = require('bookshelf')(knexion);
@@ -71,7 +73,6 @@
     __extends(App, _super);
 
     function App() {
-      this.proxy_to = __bind(this.proxy_to, this);
       this["delete"] = __bind(this["delete"], this);
       this.save_containers = __bind(this.save_containers, this);
       this.launch_service = __bind(this.launch_service, this);
@@ -153,6 +154,7 @@
               };
               return csContainer.start(cs_start_options, function(err, data) {
                 return csContainer.inspect(function(err, cscInfo) {
+                  redis_client.set(self.id, "" + cscInfo.NetworkSettings.IPAddress + ":3000");
                   return self.save_containers(cscInfo, rcInfo, function() {
                     cb(self);
                   });
@@ -203,23 +205,6 @@
           });
         }
         return self.destroy().then(cb);
-      });
-    };
-
-    App.prototype.proxy_to = function(cb) {
-      var self;
-      self = this;
-      return this.containers().fetch().then(function(collection) {
-        var container, ii, _i, _len, _ref;
-        _ref = collection.models;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          container = _ref[_i];
-          ii = container.get("inspect_info");
-          if (ii.Config.Image === "skyl/clientstate-redis") {
-            cb("" + ii.NetworkSettings.IPAddress + ":3000");
-            return;
-          }
-        }
       });
     };
 

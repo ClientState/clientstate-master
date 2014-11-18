@@ -9,6 +9,7 @@ nginx:
     - "443:443"
   links:
     - csm
+    - redis
 
 csm:
   build: .
@@ -25,6 +26,10 @@ csm:
     - "4000:4000"
   links:
     - pg
+    - redis
 
 pg:
   image: postgres
+
+redis:
+  image: redis

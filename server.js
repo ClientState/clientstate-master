@@ -33,14 +33,8 @@
   app.use("/", express["static"]("" + __dirname + "/views"));
 
   app.get("/backends/:id", function(req, res) {
-    return new mod.App({
-      id: req.params.id
-    }).fetch({
-      withRelated: ['containers']
-    }).then(function(app) {
-      return app.proxy_to(function(backend) {
-        return res.send(backend);
-      });
+    return redis_client.get(req.params.id, function(err, redis_result) {
+      return res.send(redis_result);
     });
   });
 
@@ -139,8 +133,8 @@
         res.send();
         return;
       }
-      return app_mod.launch_service(req.body, function(service) {
-        res.send(service.toJSON());
+      return app_mod.launch_service(req.body, function(app) {
+        res.send(app.toJSON());
       });
     });
   });

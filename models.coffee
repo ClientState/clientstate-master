@@ -1,5 +1,7 @@
 # global.knexion
 require './conn'
+# global.redis_client
+require './redis_conf'
 # global.docker
 require './docker'
 bookshelf = require('bookshelf')(knexion)
@@ -117,6 +119,10 @@ class App extends bookshelf.Model
             }
             csContainer.start cs_start_options, (err, data) ->
               csContainer.inspect (err, cscInfo) ->
+                redis_client.set(
+                  self.id,
+                  "#{cscInfo.NetworkSettings.IPAddress}:3000"
+                )
                 # write to the DB the details of the 2 containers
                 self.save_containers cscInfo, rcInfo, () ->
                   cb self
@@ -154,19 +160,6 @@ class App extends bookshelf.Model
         dc.stop () ->
           dc.remove () ->
       self.destroy().then cb
-
-  # Each App has one "clientstate-service" backend
-  proxy_to: (cb) =>
-    self = this
-    @containers().fetch().then (collection) ->
-      # find the container of type
-      for container in collection.models
-        ii = container.get "inspect_info"
-        # other containers are supporting
-        # TODO: rename to clientstate-service?
-        if ii.Config.Image is "skyl/clientstate-redis"
-          cb "#{ii.NetworkSettings.IPAddress}:3000"
-          return
 
   @tableName = 'apps'
   @createTable = (t) ->
