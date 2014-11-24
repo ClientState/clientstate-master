@@ -57,17 +57,25 @@
           <tr>
             <th>Provider</th>
             <th>Client ID</th>
+            <!--
             <th>Client Secret</th>
+            -->
             <th>Oauth Redirect URL</th>
+            <!--
             <th>Created</th>
             <th>Updated</th>
+            -->
           <tr ng-repeat="pis in app.provider_id_secrets">
             <td>{{ pis.provider }}</td>
             <td>{{ pis.client_id }}</td>
+            <!--
             <td>{{ pis.client_secret }}</td>
+            -->
             <td>{{ pis.oauth_redirect_url }}</td>
+            <!--
             <td>{{ pis.created_at }}</td>
             <td>{{ pis.updated_at }}</td>
+            -->
           </tr>
         </table>
       </div>

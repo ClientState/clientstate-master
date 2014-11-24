@@ -31,5 +31,15 @@ csm:
 pg:
   image: postgres
 
+pgdata:
+  image: busybox
+  volumes_from:
+    - pg
+
 redis:
   image: redis
+
+redisdata:
+  image: busybox
+  volumes_from:
+    - redis
