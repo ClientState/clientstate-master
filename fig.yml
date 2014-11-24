@@ -18,9 +18,8 @@ csm:
     GITHUB_CLIENT_SECRET:
     OAUTH_REDIRECT_URL:
     PG_USER: postgres
-    # access docker with
-    # DOCKER_PARENT_HOST
-    # and DOCKER_PARENT_PORT
+    DOCKER_PARENT_HOST:
+    DOCKER_PARENT_PORT:
   command: node server.js
   ports:
     - "4000:4000"

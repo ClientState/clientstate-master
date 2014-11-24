@@ -6,6 +6,107 @@ Login with $provider, input your secrets, get slick JS APIs to databases.
 This is the hub that launches your containers and keeps track of your secrets.
 
 
+
+
+Hack
+----
+
+Install Docker. https://docs.docker.com/installation/
+
+Install Fig. http://www.fig.sh/install.html
+
+Clone the repo:
+
+    git clone https://github.com/ClientState/clientstate-master 
+
+
+Generate a self-signed certificate:
+
+    cd clientstate-master/docker/nginx/certs
+    # see http://www.akadia.com/services/ssh_test_certificate.html 
+    openssl genrsa -des3 -out server.key 1024
+    openssl req -new -key server.key -out server.csr
+    # remove passphrase
+    cp server.key server.key.org
+    openssl rsa -in server.key.org -out server.key
+    # self-sign
+    openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+
+Git the submodule(s):
+
+    git submodule init
+    git submodule update
+    cd docker/clientstate-redis
+    docker build -t skyl/clientstate-redis .
+
+Use docker without sudo -
+http://askubuntu.com/questions/477551/how-can-i-use-docker-without-sudo
+
+
+
+
+Create an app on github whose auth callback url is
+`https://clientstate.local/auth_callback/github`
+(https://github.com/settings/applications)
+
+
+Add the environment variables:
+
+    export GITHUB_CLIENT_ID="e2fbb3800f01adb8160"
+    export GITHUB_CLIENT_SECRET="94d4d2eb9194f90ed4dfac6ad822316262e90c2"    
+    export OAUTH_REDIRECT_URL="https://clientstate.local"
+
+Point clientstate.local to your docker host add a line to /etc/hosts:
+
+    # if docker is running on the same host
+    0.0.0.0        clientstate.local
+    # if docker is running in a virtualbox, maybe
+    172.X.X.XXX    clientstate.local
+
+
+
+Fig up (this will take forever the first time):
+
+    fig up
+
+Reset the database schema:
+
+    fig run csm bash reset_schema.sh
+
+To test changes:
+
+    fig rm
+    fig build
+    fig up
+    fig run csm bash reset_schema.sh
+
+Go to https://clientstate.local and create an app.
+
+Go to github and create a new app - input the credentials in clientstate.local
+
+
+Docker should be accessible over tcp eg:
+
+    export DOCKER_OPTS="-H tcp://0.0.0.0:2375"
+    export DOCKER_PARENT_HOST="0.0.0.0"
+    export DOCKER_PARENT_PORT="2375"
+    export DOCKER_HOST="0.0.0.0:2375"
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Local Hacking
 -------------
 

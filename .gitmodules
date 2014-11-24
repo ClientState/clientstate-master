@@ -1,3 +1,4 @@
-[submodule "docker/clientstate-redis"]
-	path = docker/clientstate-redis
-	url = https://github.com/ClientState/clientstate-redis.git
+[submodule "docker/clientstate-service"]
+	path = docker/clientstate-service
+	url = https://github.com/ClientState/clientstate-service.git
+

@@ -7,6 +7,7 @@
     "bluebird": "^2.3.6",
     "body-parser": "^1.9.0",
     "bookshelf": "^0.7.7",
+    "bower": "^1.3.12",
     "chai": "^1.9.2",
     "dockerode": "^2.0.3",
     "express": "^4.9.7",
