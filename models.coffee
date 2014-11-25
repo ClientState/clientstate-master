@@ -64,12 +64,12 @@ class App extends bookshelf.Model
     self = this
     ###
     # Assume that we have an images named
-    #     skyl/clientstate-redis
+    #     skyl/clientstate-service
     #     redis images
-    # can build from the submodule - docker/clientstate-redis
+    # can build from the submodule - docker/clientstate-service
     # Assume we have a docker client instantiated with Env variables
     #
-    # Run redis and link to skyl/clientstate-redis
+    # Run redis and link to skyl/clientstate-service
     #
     # https://docs.docker.com/reference/api/docker_remote_api_v1.15/
     ###
@@ -98,7 +98,7 @@ class App extends bookshelf.Model
 
         redisContainer.inspect (err, rcInfo) ->
           cs_create_options = {
-            "Image": "skyl/clientstate-redis"
+            "Image": "skyl/clientstate-service"
             "ExposedPorts": {
               "3000/tcp": {}
             }
