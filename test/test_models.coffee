@@ -99,19 +99,14 @@ describe 'Collections', () ->
 describe 'create new redis Service', () ->
 
   beforeEach (done) ->
-    new App(id: uuid.v4()).save(null, method: "insert").then (app) ->
-      new ProviderIDSecret(app_id: app.id).save(null, method: "insert").then (pis) ->
-        done()
+    new App(id: "givenid").save(null, method: "insert").then (app) ->
+      done()
 
   it 'calls docker correctly when app.launch_service', (done) ->
     # console.log uuid.v4()
-    new App(id: "other-uuid").fetch(
-      withRelated: ["provider_id_secrets"]
-    ).then (app) ->
+    new App(id: "givenid").fetch().then (app) ->
       opts = {}
       app.launch_service opts, () ->
         assert.equal docker.callCounts.createContainer, 2
         done()
-
-
 

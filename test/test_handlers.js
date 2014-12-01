@@ -76,12 +76,12 @@
         access_token: "qwerty"
       }).set({
         "Content-Type": "application/json;charset=UTF-8"
-      }).send('{"name":"Frilz-not-kidding"}').expect(200).end(function(err, res) {
+      }).send('{ "name":"Frilz-not-kidding", "id":"theid", "secret":"thesecret", "oauth_redirect_url":"http://foobar.com" }').expect(200).end(function(err, res) {
         return new App({
           user_id: 1
         }).fetchAll().then(function(apps) {
           assert.equal(apps.length, 2);
-          assert.equal(apps._byId['other-uuid'].get('name'), "Frilz-not-kidding");
+          assert.equal(apps._byId['theid'].get('name'), "Frilz-not-kidding");
           return done();
         });
       });
@@ -101,33 +101,6 @@
         }).containers().fetch().then(function(collection) {
           assert.equal(collection.models.length, 2);
           assert.equal(docker.callCounts.createContainer, 2);
-          return done();
-        });
-      });
-    });
-  });
-
-  describe('ProviderIDSecrets for App', function() {
-    beforeEach(createAppForUser);
-    return it('Create ProviderIDSecret with POST', function(done) {
-      var j;
-      j = {
-        client_id: "client_id_asdf",
-        client_secret: "client_secret_asdf",
-        oauth_redirect_url: "http://example.com/auth/github"
-      };
-      return request(app).post('/apps/this-uuid/provider-id-secrets').set({
-        access_token: "qwerty"
-      }).set({
-        "Content-Type": "application/json;charset=UTF-8"
-      }).send(JSON.stringify(j)).expect(200).end(function(err, res) {
-        return new ProviderIDSecret({
-          id: 1
-        }).fetch().then(function(pis) {
-          assert.equal(pis.get("app_id"), "this-uuid");
-          assert.equal(pis.get("client_id"), j.client_id);
-          assert.equal(pis.get("client_secret"), j.client_secret);
-          assert.equal(pis.get("oauth_redirect_url"), j.oauth_redirect_url);
           return done();
         });
       });

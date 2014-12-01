@@ -142,25 +142,17 @@
   describe('create new redis Service', function() {
     beforeEach(function(done) {
       return new App({
-        id: uuid.v4()
+        id: "givenid"
       }).save(null, {
         method: "insert"
       }).then(function(app) {
-        return new ProviderIDSecret({
-          app_id: app.id
-        }).save(null, {
-          method: "insert"
-        }).then(function(pis) {
-          return done();
-        });
+        return done();
       });
     });
     return it('calls docker correctly when app.launch_service', function(done) {
       return new App({
-        id: "other-uuid"
-      }).fetch({
-        withRelated: ["provider_id_secrets"]
-      }).then(function(app) {
+        id: "givenid"
+      }).fetch().then(function(app) {
         var opts;
         opts = {};
         return app.launch_service(opts, function() {
