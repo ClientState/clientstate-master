@@ -91,12 +91,18 @@ class App extends bookshelf.Model
       },
     }
     docker.createContainer redis_create_options, (err, redisContainer) ->
+      if err?
+        console.log err
+        return
 
       redis_start_options = {
         "PortBindings": { "6379/tcp": {} },
         #"PublishAllPorts": true,
       }
       redisContainer.start redis_start_options, (err, data) ->
+        if err?
+          console.log err
+          return
 
         GITHUB_CLIENT_ID = self.id
         GITHUB_CLIENT_SECRET = self.secret
@@ -105,6 +111,10 @@ class App extends bookshelf.Model
         # TODO: support providers other than github for child apps.
 
         redisContainer.inspect (err, rcInfo) ->
+          if err?
+            console.log err
+            return
+
           cs_create_options = {
             "Image": "skyl/clientstate-service"
             "ExposedPorts": {
@@ -118,6 +128,9 @@ class App extends bookshelf.Model
             ]
           }
           docker.createContainer cs_create_options, (err, csContainer) ->
+            if err?
+              console.log err
+              return
             # add port information to service
             cs_start_options = {
               "Links": ["#{rcInfo.Name}:redis"],

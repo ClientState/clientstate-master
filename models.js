@@ -123,6 +123,10 @@
       };
       return docker.createContainer(redis_create_options, function(err, redisContainer) {
         var redis_start_options;
+        if (err != null) {
+          console.log(err);
+          return;
+        }
         redis_start_options = {
           "PortBindings": {
             "6379/tcp": {}
@@ -130,11 +134,19 @@
         };
         return redisContainer.start(redis_start_options, function(err, data) {
           var GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, OAUTH_REDIRECT_URL;
+          if (err != null) {
+            console.log(err);
+            return;
+          }
           GITHUB_CLIENT_ID = self.id;
           GITHUB_CLIENT_SECRET = self.secret;
           OAUTH_REDIRECT_URL = self.oauth_redirect_url;
           return redisContainer.inspect(function(err, rcInfo) {
             var cs_create_options;
+            if (err != null) {
+              console.log(err);
+              return;
+            }
             cs_create_options = {
               "Image": "skyl/clientstate-service",
               "ExposedPorts": {
@@ -144,6 +156,10 @@
             };
             return docker.createContainer(cs_create_options, function(err, csContainer) {
               var cs_start_options;
+              if (err != null) {
+                console.log(err);
+                return;
+              }
               cs_start_options = {
                 "Links": ["" + rcInfo.Name + ":redis"],
                 "PortBindings": {
