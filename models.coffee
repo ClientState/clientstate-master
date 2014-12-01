@@ -8,27 +8,20 @@ bookshelf = require('bookshelf')(knexion)
 
 
 class User extends bookshelf.Model
-  tableName: 'users'
   hasTimestamps: true
-
-  logins: () ->
-    this.hasMany ProviderLoginDetails
-
-  # DDL with knex
+  tableName: 'users'
   @tableName = 'users'
   @createTable = (t) ->
     t.increments 'id'
     t.timestamps()
     return
 
+  logins: () ->
+    this.hasMany ProviderLoginDetails
+
 
 class ProviderLoginDetails extends bookshelf.Model
   tableName: 'provider_login_details'
-  hasTimestamps: true
-
-  user: () ->
-    @belongsTo User
-
   @tableName = 'provider_login_details'
   @createTable: (t) ->
     t.string('id').primary()
@@ -44,19 +37,36 @@ class ProviderLoginDetails extends bookshelf.Model
       # .onUpdate
     return
 
+  user: () ->
+    @belongsTo User
+
 
 class App extends bookshelf.Model
-  tableName: 'apps'
   hasTimestamps: true
+  tableName: 'apps'
+  @tableName = 'apps'
+  @createTable = (t) ->
+    # One-to-One correspondence to Github app
+    # GITHUB_CLIENT_ID
+    t.string('id').primary()
+    # GITHUB_CLIENT_SECRET
+    t.string('secret')
+    # OAUTH_REDIRECT_URL
+    t.string('oauth_redirect_url')
+    # TODO - just get information from github?
+    t.string('name')
+    t.timestamps()
+    t.integer('user_id')
+      .unsigned()
+      .references('id')
+      .inTable('users')
+    return
 
   user: () ->
     @belongsTo User
 
   containers: () ->
     @hasMany Container
-
-  provider_id_secrets: () ->
-    @hasMany ProviderIDSecret
 
   # opts are now theoretical
   # req.body is passed straight in
@@ -88,13 +98,11 @@ class App extends bookshelf.Model
       }
       redisContainer.start redis_start_options, (err, data) ->
 
-        # TODO: support more than github
-        for pis_mod in self.relations.provider_id_secrets.models
-          if pis_mod.get('provider') is "github"
-            GITHUB_CLIENT_ID = pis_mod.get 'client_id'
-            GITHUB_CLIENT_SECRET = pis_mod.get 'client_secret'
-            OAUTH_REDIRECT_URL = pis_mod.get 'oauth_redirect_url'
-            break
+        GITHUB_CLIENT_ID = self.id
+        GITHUB_CLIENT_SECRET = self.secret
+        OAUTH_REDIRECT_URL = self.oauth_redirect_url
+
+        # TODO: support providers other than github for child apps.
 
         redisContainer.inspect (err, rcInfo) ->
           cs_create_options = {
@@ -110,7 +118,6 @@ class App extends bookshelf.Model
             ]
           }
           docker.createContainer cs_create_options, (err, csContainer) ->
-
             # add port information to service
             cs_start_options = {
               "Links": ["#{rcInfo.Name}:redis"],
@@ -161,39 +168,6 @@ class App extends bookshelf.Model
           dc.remove () ->
       self.destroy().then cb
 
-  @tableName = 'apps'
-  @createTable = (t) ->
-    t.string('id').primary()
-    t.timestamps()
-    t.string 'name'
-    t.integer('user_id')
-      .unsigned()
-      .references('id')
-      .inTable('users')
-    return
-
-
-class ProviderIDSecret extends bookshelf.Model
-  tableName: 'provider_id_secrets'
-  hasTimestamps: true
-
-  app: () ->
-    @belongsTo App
-
-  @tableName = 'provider_id_secrets'
-  @createTable = (t) ->
-    t.increments 'id'
-    t.timestamps()
-    t.string 'provider'
-    t.string 'client_id'
-    t.string 'client_secret'
-    t.string 'oauth_redirect_url'
-    t.string('app_id')
-      .references('id')
-      .inTable('apps')
-      .onDelete('CASCADE')
-    return
-
 
 class Container extends bookshelf.Model
   tableName: 'containers'
@@ -218,5 +192,4 @@ global.bookshelf = bookshelf
 module.exports.User = User
 module.exports.ProviderLoginDetails = ProviderLoginDetails
 module.exports.App = App
-module.exports.ProviderIDSecret = ProviderIDSecret
 module.exports.Container = Container

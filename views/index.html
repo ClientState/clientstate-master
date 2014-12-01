@@ -18,8 +18,8 @@
   padding: 1em;
   border: 1px solid orange;
 }
-.new-provider-id-secret {
-  margin-top: 1em;
+#new-app input {
+  min-width: 300px;
 }
 </style>
 </head>
@@ -35,81 +35,43 @@
   <div ng-show="$storage.github_access_token">
     <button ng-click="logout()">Logout</button>
 
-    <!-- Edit existing Apps -->
     <div class="app" ng-repeat="app in apps">
       <h1>{{ app.name }}</h1>
       <table class="table">
         <tr>
-          <th>Name</th>
-          <th>appid</th>
-          <th>Actions</th>
+          <th>name</th>
+          <th>id</th>
+          <th>secret</th>
+          <th>url</th>
         </tr>
         <tr>
           <td><input ng-model="app.name"> <button ng-click="save_app(app)">Save</button></td>
           <td>{{ app.id }}</td>
-          <td>TODO: delete and ....</td>
+          <td>{{ app.secret }}</td>
+          <td>{{ app.oauth_redirect_url }}</td>
         </tr>
       </table>
 
-      <div ng-show="app.provider_id_secrets.length > 0">
-        <h3>Provider Id Secrets</h3>
-        <table class="table">
-          <tr>
-            <th>Provider</th>
-            <th>Client ID</th>
-            <!--
-            <th>Client Secret</th>
-            -->
-            <th>Oauth Redirect URL</th>
-            <!--
-            <th>Created</th>
-            <th>Updated</th>
-            -->
-          <tr ng-repeat="pis in app.provider_id_secrets">
-            <td>{{ pis.provider }}</td>
-            <td>{{ pis.client_id }}</td>
-            <!--
-            <td>{{ pis.client_secret }}</td>
-            -->
-            <td>{{ pis.oauth_redirect_url }}</td>
-            <!--
-            <td>{{ pis.created_at }}</td>
-            <td>{{ pis.updated_at }}</td>
-            -->
-          </tr>
-        </table>
+      <div ng-show="app.containers.length > 0">
+        LAUNCHED!
       </div>
-      <!--
-      TODO: allow only 1 PIS per provider per app
-      so, change a bit when we support multiple providers
-      -->
-      <div class="new-provider-id-secret" ng-show="app.provider_id_secrets.length < 1">
-        <input class="form-control" ng-model="app.new_client_id" placeholder="GITHUB_CLIENT_ID">
-        <input class="form-control" ng-model="app.new_client_secret" placeholder="GITHUB_CLIENT_SECRET">
-        <input class="form-control" ng-model="app.new_oauth_redirect_url" placeholder="OAUTH_REDIRECT_URL">
-        <button ng-click="create_pis(app)">
-          Save App Credentials
+      <div ng-show="app.containers.length == 0">
+        <button ng-click="launch_service(app.id)">
+          Launch!
         </button>
       </div>
-
-
-      <div ng-show="app.provider_id_secrets.length > 0">
-        <div ng-show="app.containers.length > 0">
-          LAUNCHED!
-        </div>
-        <div ng-show="app.containers.length == 0">
-          <button ng-click="launch_service(app.id)">
-            Launch!
-          </button>
-        </div>
-      </div>
-
     </div><!-- app in apps -->
+
+
     <!-- Create a new App -->
-    <div id="new-app" ng-show="$storage.github_access_token">
-      <input ng-model="newAppName" placeholder="New App Name">
+    <div id="new-app" class="input-group" ng-show="$storage.github_access_token">
+      <input ng-model="newapp_name" placeholder="New App Name">
+      <input ng-model="newapp_id" placeholder="GITHUB_CLIENT_ID">
+      <input ng-model="newapp_secret" placeholder="GITHUB_CLIENT_SECRET">
+      <input ng-model="newapp_oauth_redirect_url" placeholder="OAUTH_REDIRECT_URL">
       <button ng-click="create_new_app()">Create New App</button>
     </div>
+
   </div><!-- logged in - $storage.github_access_token -->
 
 

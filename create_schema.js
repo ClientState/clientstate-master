@@ -19,12 +19,9 @@
     });
     return c(m.App).then(function() {
       l("App created");
-      return c(m.ProviderIDSecret).then(function() {
-        l("ProviderIDSecret created");
-        return c(m.Container).then(function() {
-          l("Container created");
-          return process.exit();
-        });
+      return c(m.Container).then(function() {
+        l("Container created");
+        return process.exit();
       });
     });
   });

@@ -40,9 +40,15 @@ CSMController = ($scope, $http, $localStorage) ->
       cb()
 
   $scope.create_new_app = (cb = () ->) ->
-    $http.post('/apps', name: $scope.newAppName).success (res) ->
+    data = {
+      name: $scope.newapp_name
+      id: $scope.newapp_id
+      secret: $scope.newapp_secret
+      oauth_redirect_url: $scope.newapp_oauth_redirect_url
+    }
+    $http.post('/apps', data).success (res) ->
+      $scope.newapp_name = ""
       # should we just insert into our array without calling over http?
-      $scope.newAppName = ""
       $scope.get_apps cb
 
   $scope.save_app = (app) ->

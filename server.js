@@ -73,7 +73,7 @@
     return new mod.App({
       user_id: req.user.id
     }).fetchAll({
-      withRelated: ['containers', 'provider_id_secrets']
+      withRelated: ['containers']
     }).then(function(collection) {
       res.send(collection.toJSON());
     });
@@ -81,8 +81,10 @@
 
   app.post("/apps", function(req, res) {
     app = new mod.App({
-      id: uuid.v4(),
+      id: req.body.id,
+      secret: req.body.secret,
       name: req.body.name,
+      oauth_redirect_url: req.body.oauth_redirect_url,
       user_id: req.user.id
     });
     return app.save(null, {
@@ -105,29 +107,11 @@
     });
   });
 
-  app.post("/apps/:id/provider-id-secrets", function(req, res) {
-    var PIS;
-    PIS = {
-      provider: "github",
-      app_id: req.params.id,
-      client_id: req.body.client_id,
-      client_secret: req.body.client_secret,
-      oauth_redirect_url: req.body.oauth_redirect_url
-    };
-    return new mod.ProviderIDSecret(PIS).save(null, {
-      method: "insert"
-    }).then(function(pis) {
-      return res.send("OK");
-    });
-  });
-
   app.post("/apps/:id/launch", function(req, res) {
     return new mod.App({
       id: req.params.id,
       user_id: req.user.id
-    }).fetch({
-      withRelated: ['provider_id_secrets']
-    }).then(function(app_mod) {
+    }).fetch().then(function(app_mod) {
       if (app_mod === null) {
         res.status(404).write("App not found");
         res.send();

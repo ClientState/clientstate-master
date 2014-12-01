@@ -61,16 +61,19 @@ app.get "/apps", (req, res) ->
   new mod.App(
     user_id: req.user.id
   ).fetchAll(
-    withRelated: ['containers', 'provider_id_secrets']
+    withRelated: ['containers']
   ).then (collection) ->
     res.send collection.toJSON()
     return
 
 app.post "/apps", (req, res) ->
   # create new App for User
+  # Github credentials are posted
   app = new mod.App
-    id: uuid.v4()
+    id: req.body.id
+    secret: req.body.secret
     name: req.body.name
+    oauth_redirect_url: req.body.oauth_redirect_url
     user_id: req.user.id
   app.save(null, method: "insert").then () ->
     res.send "OK"
@@ -84,25 +87,12 @@ app.put "/apps/:id", (req, res) ->
     res.send "OK"
     return
 
-app.post "/apps/:id/provider-id-secrets", (req, res) ->
-  # Create PIS for App
-  PIS =
-    provider: "github"
-    app_id: req.params.id
-    client_id: req.body.client_id
-    client_secret: req.body.client_secret
-    oauth_redirect_url: req.body.oauth_redirect_url
-  new mod.ProviderIDSecret(PIS).save(null, method: "insert").then (pis) ->
-    res.send "OK"
-
 app.post "/apps/:id/launch", (req, res) ->
   # create containers for App
   new mod.App(
     id: req.params.id
     user_id: req.user.id
-  ).fetch(
-    withRelated: ['provider_id_secrets']
-  ).then (app_mod) ->
+  ).fetch().then (app_mod) ->
     if app_mod is null
       res.status(404).write("App not found")
       res.send()

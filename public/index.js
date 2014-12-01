@@ -44,13 +44,18 @@
       });
     };
     $scope.create_new_app = function(cb) {
+      var data;
       if (cb == null) {
         cb = function() {};
       }
-      return $http.post('/apps', {
-        name: $scope.newAppName
-      }).success(function(res) {
-        $scope.newAppName = "";
+      data = {
+        name: $scope.newapp_name,
+        id: $scope.newapp_id,
+        secret: $scope.newapp_secret,
+        oauth_redirect_url: $scope.newapp_oauth_redirect_url
+      };
+      return $http.post('/apps', data).success(function(res) {
+        $scope.newapp_name = "";
         return $scope.get_apps(cb);
       });
     };
