@@ -105,8 +105,8 @@ This time, make the auth callback be:
 
 Input the github credentials for `sweet-app`
 into the webapp at clientstate.local.
-Make the `OAUTH_REDIRECT_URL` be where your static webpage will be,
-for instance, `http://localhost:9001`
+`OAUTH_REDIRECT_URL` is where your static webpage will be,
+for instance, `http://localhost:9001` or `http://baz.github.io/foobar`
 
 Hit LAUNCH button.
 

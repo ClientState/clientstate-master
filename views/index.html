@@ -64,7 +64,8 @@
 
 
     <!-- Create a new App -->
-    <div id="new-app" class="input-group" ng-show="$storage.github_access_token">
+    <div id="new-app" class="input-group app" ng-show="$storage.github_access_token">
+      <h1>Create new App</h1>
       <input ng-model="newapp_name" placeholder="New App Name">
       <input ng-model="newapp_id" placeholder="GITHUB_CLIENT_ID">
       <input ng-model="newapp_secret" placeholder="GITHUB_CLIENT_SECRET">

@@ -56,6 +56,9 @@
       };
       return $http.post('/apps', data).success(function(res) {
         $scope.newapp_name = "";
+        $scope.newapp_id = "";
+        $scope.newapp_secret = "";
+        $scope.newapp_oauth_redirect_url = "";
         return $scope.get_apps(cb);
       });
     };
