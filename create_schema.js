@@ -14,14 +14,14 @@
 
   c(m.User).then(function() {
     l("User created");
-    c(m.ProviderLoginDetails).then(function() {
-      return l("ProviderLoginDetails created");
-    });
-    return c(m.App).then(function() {
-      l("App created");
-      return c(m.Container).then(function() {
-        l("Container created");
-        return process.exit();
+    return c(m.ProviderLoginDetails).then(function() {
+      l("ProviderLoginDetails created");
+      return c(m.App).then(function() {
+        l("App created");
+        return c(m.Container).then(function() {
+          l("Container created");
+          return process.exit();
+        });
       });
     });
   });

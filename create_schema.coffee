@@ -17,8 +17,8 @@ c(m.User).then () ->
   l "User created"
   c(m.ProviderLoginDetails).then () ->
     l "ProviderLoginDetails created"
-  c(m.App).then () ->
-    l "App created"
-    c(m.Container).then () ->
-      l "Container created"
-      process.exit()
+    c(m.App).then () ->
+      l "App created"
+      c(m.Container).then () ->
+        l "Container created"
+        process.exit()
