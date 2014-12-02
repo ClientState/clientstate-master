@@ -1,3 +1,6 @@
 [submodule "docker/clientstate-service"]
 	path = docker/clientstate-service
 	url = https://github.com/ClientState/clientstate-service
+[submodule "clients/clientstate-js"]
+	path = clients/clientstate-js
+	url = https://github.com/ClientState/clientstate-js
