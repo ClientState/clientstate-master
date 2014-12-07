@@ -4,3 +4,6 @@
 [submodule "clients/clientstate-js"]
 	path = clients/clientstate-js
 	url = https://github.com/ClientState/clientstate-js
+[submodule "clients/clientstate-python"]
+	path = clients/clientstate-python
+	url = https://github.com/ClientState/clientstate-python
