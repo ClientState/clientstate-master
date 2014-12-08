@@ -9,6 +9,8 @@ This is the hub that launches your containers and keeps track of your secrets.
 
 ### Dependencies
 
+**Warning - You must have a 64-bit host!**
+
 Install Docker. https://docs.docker.com/installation/
 
 Install Fig. http://www.fig.sh/install.html
@@ -21,9 +23,13 @@ Install Fig. http://www.fig.sh/install.html
 
 ###### Generate a self-signed certificate:
 
+This certificate is only for development.
+There will be no passphrase by the end - input whatever you want initially.
+Input arbitrary/default values for all the questions.
+see http://www.akadia.com/services/ssh_test_certificate.html
+
     mkdir -p clientstate-master/docker/nginx/certs
     cd clientstate-master/docker/nginx/certs
-    # see http://www.akadia.com/services/ssh_test_certificate.html 
     openssl genrsa -des3 -out server.key 1024
     openssl req -new -key server.key -out server.csr
     # remove passphrase
