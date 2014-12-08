@@ -21,6 +21,7 @@ Install Fig. http://www.fig.sh/install.html
 
 ###### Generate a self-signed certificate:
 
+    mkdir -p clientstate-master/docker/nginx/certs
     cd clientstate-master/docker/nginx/certs
     # see http://www.akadia.com/services/ssh_test_certificate.html 
     openssl genrsa -des3 -out server.key 1024
