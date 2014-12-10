@@ -5,7 +5,7 @@ models = {
   App
 } = require "../models"
 
-{assert} = require "chai"
+{assert, expect} = require "chai"
 
 # global.uuid
 # global.docker
@@ -99,14 +99,22 @@ describe 'Collections', () ->
 describe 'create new redis Service', () ->
 
   beforeEach (done) ->
-    new App(id: "givenid").save(null, method: "insert").then (app) ->
+    new App(
+      id: "theid"
+      secret: "thesecret"
+      oauth_redirect_url: "theurl"
+    ).save(null, method: "insert").then (app) ->
       done()
 
   it 'calls docker correctly when app.launch_service', (done) ->
     # console.log uuid.v4()
-    new App(id: "givenid").fetch().then (app) ->
+    new App(id: "theid").fetch().then (app) ->
       opts = {}
       app.launch_service opts, () ->
         assert.equal docker.callCounts.createContainer, 2
+        env = docker.options.createContainer[1].Env
+        expect(env).to.include('GITHUB_CLIENT_ID=theid')
+        expect(env).to.include('GITHUB_CLIENT_SECRET=thesecret')
+        expect(env).to.include('OAUTH_REDIRECT_URL=theurl')
         done()
 

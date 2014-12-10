@@ -103,10 +103,9 @@ class App extends bookshelf.Model
         if err?
           console.log err
           return
-
-        GITHUB_CLIENT_ID = self.id
-        GITHUB_CLIENT_SECRET = self.secret
-        OAUTH_REDIRECT_URL = self.oauth_redirect_url
+        GITHUB_CLIENT_ID = self.get "id"
+        GITHUB_CLIENT_SECRET = self.get "secret"
+        OAUTH_REDIRECT_URL = self.get "oauth_redirect_url"
 
         # TODO: support providers other than github for child apps.
 
@@ -124,6 +123,7 @@ class App extends bookshelf.Model
               "GITHUB_CLIENT_ID=#{GITHUB_CLIENT_ID}"
               "GITHUB_CLIENT_SECRET=#{GITHUB_CLIENT_SECRET}"
               "OAUTH_REDIRECT_URL=#{OAUTH_REDIRECT_URL}"
+              # TODO: no debug
               "DEBUG=yes"
             ]
           }

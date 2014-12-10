@@ -52,18 +52,28 @@
       createContainer: 0
     };
 
+    MockDocker.prototype.options = {
+      createContainer: []
+    };
+
     MockDocker.prototype.createContainer = function(opts, cb) {
       this.callCounts.createContainer += 1;
+      this.options.createContainer.push(opts);
       return cb(null, new MockContainer());
     };
 
     MockDocker.prototype.reset = function() {
-      var k, v, _ref, _results;
+      var k, v, _ref, _ref1, _results;
       _ref = this.callCounts;
-      _results = [];
       for (k in _ref) {
         v = _ref[k];
-        _results.push(this.callCounts[k] = 0);
+        this.callCounts[k] = 0;
+      }
+      _ref1 = this.options;
+      _results = [];
+      for (k in _ref1) {
+        v = _ref1[k];
+        _results.push(this.options[k] = []);
       }
       return _results;
     };

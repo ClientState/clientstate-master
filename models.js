@@ -138,9 +138,9 @@
             console.log(err);
             return;
           }
-          GITHUB_CLIENT_ID = self.id;
-          GITHUB_CLIENT_SECRET = self.secret;
-          OAUTH_REDIRECT_URL = self.oauth_redirect_url;
+          GITHUB_CLIENT_ID = self.get("id");
+          GITHUB_CLIENT_SECRET = self.get("secret");
+          OAUTH_REDIRECT_URL = self.get("oauth_redirect_url");
           return redisContainer.inspect(function(err, rcInfo) {
             var cs_create_options;
             if (err != null) {

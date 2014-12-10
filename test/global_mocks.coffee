@@ -36,14 +36,20 @@ class MockDocker
   callCounts: {
     createContainer: 0
   }
+  options: {
+    createContainer: []
+  }
 
   createContainer: (opts, cb) ->
     @callCounts.createContainer += 1
+    @options.createContainer.push opts
     cb(null, new MockContainer())
 
   reset: () ->
     for k,v of @callCounts
       @callCounts[k] = 0
+    for k,v of @options
+      @options[k] = []
 
 
 class MockRedisClient
