@@ -26,6 +26,7 @@ CSMController = ($scope, $http, $localStorage) ->
     OAuth.initialize $scope.clientid
     OAuth.setOAuthdURL window.location.origin
     OAuth.popup "github", (err, provider_data) ->
+      # console.log provider_data
 
       if err?
         console.log err.stack

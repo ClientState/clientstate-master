@@ -1,9 +1,11 @@
 nginx:
-  # volumes with vagrant are wtf.
-  # so, we add the confs in the dockerfile
-  environment:
-    CSM_SERVER_NAME:
+  # volumes with vagrant were wtf.
+  # so, we added the confs in the dockerfile
+  # TODO: use the standard image and volumes?
   build: ./docker/nginx/
+  environment:
+    # clientstate.local, clientstate.io ...
+    CSM_SERVER_NAME:
   ports:
     - "80:80"
     - "443:443"
@@ -20,7 +22,12 @@ csm:
     PG_USER: postgres
     DOCKER_PARENT_HOST:
     DOCKER_PARENT_PORT:
-  command: node server.js
+  command: node /src/server.js
+  # we are relying on the host mahcine having run:
+  # RUN npm install
+  # RUN ./node_modules/bower/bin/bower install --allow-root
+  volumes:
+    - .:/src
   ports:
     - "4000:4000"
   links:

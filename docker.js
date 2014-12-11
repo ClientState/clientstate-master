@@ -5,7 +5,7 @@
   Docker = require('dockerode');
 
   docker = new Docker({
-    host: process.env.DOCKER_PARENT_HOST || '172.17.8.101',
+    host: process.env.DOCKER_PARENT_HOST || '192.168.59.103',
     port: process.env.DOCKER_PARENT_PORT || 2375
   });
 

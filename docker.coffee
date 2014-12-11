@@ -1,8 +1,13 @@
 Docker = require 'dockerode'
 
 docker = new Docker
-  host: process.env.DOCKER_PARENT_HOST or '172.17.8.101'
+  # boot2docker is default
+  # for now, we have just
+  # http://blog.sequenceiq.com/blog/2014/10/17/boot2docker-tls-workaround/
+  host: process.env.DOCKER_PARENT_HOST or '192.168.59.103'
   port: process.env.DOCKER_PARENT_PORT or 2375
+  # TODO: actually use TLS
+  #protocol: 'https'
   #ca: fs.readFileSync('ca.pem'),
   #cert: fs.readFileSync('cert.pem'),
   #key: fs.readFileSync('key.pem')
