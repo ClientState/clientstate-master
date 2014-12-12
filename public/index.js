@@ -88,6 +88,11 @@
         return $scope.get_apps();
       });
     };
+    $scope.relaunch_service = function(app_id) {
+      return $http.post("/apps/" + app_id + "/relaunch").success(function(res) {
+        return $scope.get_apps();
+      });
+    };
     init = function() {
       if ($scope.$storage.github_access_token != null) {
         return $scope.ack_token();

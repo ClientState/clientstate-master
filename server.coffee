@@ -102,6 +102,21 @@ app.post "/apps/:id/launch", (req, res) ->
       res.send app.toJSON()
       return
 
+app.post "/apps/:id/relaunch", (req, res) ->
+  # create containers for App
+  new mod.App(
+    id: req.params.id
+    user_id: req.user.id
+  ).fetch().then (app_mod) ->
+    if app_mod is null
+      res.status(404).write("App not found")
+      res.send()
+      return
+    # req.body could have options
+    app_mod.relaunch_service req.body, (app) ->
+      res.send app.toJSON()
+      return
+
 
 # app at ENV -- GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET
 # must match the callback url, in this case,

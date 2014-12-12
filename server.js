@@ -123,6 +123,22 @@
     });
   });
 
+  app.post("/apps/:id/relaunch", function(req, res) {
+    return new mod.App({
+      id: req.params.id,
+      user_id: req.user.id
+    }).fetch().then(function(app_mod) {
+      if (app_mod === null) {
+        res.status(404).write("App not found");
+        res.send();
+        return;
+      }
+      return app_mod.relaunch_service(req.body, function(app) {
+        res.send(app.toJSON());
+      });
+    });
+  });
+
   server = app.listen(4000, function() {
     return console.log('Listening on port %d', server.address().port);
   });

@@ -54,6 +54,9 @@
 
       <div ng-show="app.containers.length > 0">
         LAUNCHED!
+        <button ng-click="relaunch_service(app.id)">
+          Relaunch!
+        </button>
       </div>
       <div ng-show="app.containers.length == 0">
         <button ng-click="launch_service(app.id)">

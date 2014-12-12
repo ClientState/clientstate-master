@@ -13,11 +13,23 @@
 
     MockContainer.prototype.callCounts = {
       start: 0,
+      stop: 0,
+      remove: 0,
       inspect: 0
     };
 
     MockContainer.prototype.start = function(opts, cb) {
       this.callCounts.start += 1;
+      return cb();
+    };
+
+    MockContainer.prototype.stop = function(cb) {
+      this.callCounts.stop += 1;
+      return cb();
+    };
+
+    MockContainer.prototype.remove = function(cb) {
+      this.callCounts.remove += 1;
       return cb();
     };
 
@@ -49,17 +61,30 @@
     function MockDocker() {}
 
     MockDocker.prototype.callCounts = {
-      createContainer: 0
+      createContainer: 0,
+      getContainer: 0
     };
 
-    MockDocker.prototype.options = {
-      createContainer: []
+    MockDocker.prototype["arguments"] = {
+      createContainer: [],
+      getContainer: []
     };
 
     MockDocker.prototype.createContainer = function(opts, cb) {
       this.callCounts.createContainer += 1;
-      this.options.createContainer.push(opts);
+      this["arguments"].createContainer.push({
+        '0': opts,
+        '1': cb
+      });
       return cb(null, new MockContainer());
+    };
+
+    MockDocker.prototype.getContainer = function(id) {
+      this.callCounts.getContainer += 1;
+      this["arguments"].getContainer.push({
+        '0': id
+      });
+      return new MockContainer();
     };
 
     MockDocker.prototype.reset = function() {
@@ -69,11 +94,11 @@
         v = _ref[k];
         this.callCounts[k] = 0;
       }
-      _ref1 = this.options;
+      _ref1 = this["arguments"];
       _results = [];
       for (k in _ref1) {
         v = _ref1[k];
-        _results.push(this.options[k] = []);
+        _results.push(this["arguments"][k] = []);
       }
       return _results;
     };

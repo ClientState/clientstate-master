@@ -3,6 +3,7 @@ models = {
   ProviderIDSecret
   ProviderLoginDetails
   App
+  Container
 } = require "../models"
 
 {assert, expect} = require "chai"
@@ -96,7 +97,7 @@ describe 'Collections', () ->
       done()
 
 
-describe 'create new redis Service', () ->
+describe 'Launch Redis Service', () ->
 
   beforeEach (done) ->
     new App(
@@ -107,14 +108,44 @@ describe 'create new redis Service', () ->
       done()
 
   it 'calls docker correctly when app.launch_service', (done) ->
-    # console.log uuid.v4()
     new App(id: "theid").fetch().then (app) ->
       opts = {}
       app.launch_service opts, () ->
         assert.equal docker.callCounts.createContainer, 2
-        env = docker.options.createContainer[1].Env
+        env = docker.arguments.createContainer[1]['0'].Env
         expect(env).to.include('GITHUB_CLIENT_ID=theid')
         expect(env).to.include('GITHUB_CLIENT_SECRET=thesecret')
         expect(env).to.include('OAUTH_REDIRECT_URL=theurl')
         done()
 
+describe 'Relaunch Redis Service', () ->
+  beforeEach (done) ->
+    new App(
+      id: "theid"
+      secret: "thesecret"
+      oauth_redirect_url: "theurl"
+    ).save(null, method: "insert").then (app) ->
+      new Container(
+        app_id: "theid"
+        id: "foobar1"
+      ).save(null, method: "insert").then () ->
+        done()
+
+  it 'makes correct calls when app.relaunch_service', (done) ->
+    new App(id: "theid").fetch().then (app) ->
+      opts = {}
+      app.containers().fetch().then (collection) ->
+        assert.equal(collection.models.length, 1)
+        assert.equal(collection.models[0].id, "foobar1")
+
+        app.relaunch_service opts, () ->
+          app.containers().fetch().then (collection) ->
+            assert.equal(collection.models.length, 2)
+            # foobar1 is not here, trust me
+            #console.log collection.models
+            assert.equal docker.callCounts.createContainer, 2
+            env = docker.arguments.createContainer[1]['0'].Env
+            expect(env).to.include('GITHUB_CLIENT_ID=theid')
+            expect(env).to.include('GITHUB_CLIENT_SECRET=thesecret')
+            expect(env).to.include('OAUTH_REDIRECT_URL=theurl')
+            done()

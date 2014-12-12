@@ -148,6 +148,19 @@ class App extends bookshelf.Model
                   cb self
                   return
 
+  relaunch_service: (opts, cb) =>
+    self = @
+    @containers().fetch().then (collection) ->
+      length = collection.models.length
+      for container in collection.models
+        dc = docker.getContainer(container.id)
+        dc.stop () ->
+          dc.remove () ->
+            length -= 1
+            if length is 0
+              collection.invokeThen('destroy', {}).then () ->
+                self.launch_service opts, cb
+
   save_containers: () =>
     # pass in a list of infos that come in from docker inspect
 

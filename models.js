@@ -73,6 +73,7 @@
     function App() {
       this["delete"] = __bind(this["delete"], this);
       this.save_containers = __bind(this.save_containers, this);
+      this.relaunch_service = __bind(this.relaunch_service, this);
       this.launch_service = __bind(this.launch_service, this);
       return App.__super__.constructor.apply(this, arguments);
     }
@@ -177,6 +178,32 @@
             });
           });
         });
+      });
+    };
+
+    App.prototype.relaunch_service = function(opts, cb) {
+      var self;
+      self = this;
+      return this.containers().fetch().then(function(collection) {
+        var container, dc, length, _i, _len, _ref, _results;
+        length = collection.models.length;
+        _ref = collection.models;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          container = _ref[_i];
+          dc = docker.getContainer(container.id);
+          _results.push(dc.stop(function() {
+            return dc.remove(function() {
+              length -= 1;
+              if (length === 0) {
+                return collection.invokeThen('destroy', {}).then(function() {
+                  return self.launch_service(opts, cb);
+                });
+              }
+            });
+          }));
+        }
+        return _results;
       });
     };
 

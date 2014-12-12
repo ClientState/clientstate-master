@@ -22,6 +22,8 @@ csm:
     PG_USER: postgres
     DOCKER_PARENT_HOST:
     DOCKER_PARENT_PORT:
+  # TODO: not use nodemon in prod?
+  #command: /src/node_modules/nodemon/bin/nodemon.js /src/server.js
   command: node /src/server.js
   # we are relying on the host mahcine having run:
   # RUN npm install

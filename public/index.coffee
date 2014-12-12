@@ -38,6 +38,7 @@ CSMController = ($scope, $http, $localStorage) ->
   $scope.get_apps = (cb = ()->) ->
     $http.get('/apps').success (res) ->
       $scope.apps = res
+      # make background flash green
       cb()
 
   $scope.create_new_app = (cb = () ->) ->
@@ -77,6 +78,11 @@ CSMController = ($scope, $http, $localStorage) ->
     $http.post("/apps/#{app_id}/launch").success (res) ->
       $scope.get_apps()
 
+  $scope.relaunch_service = (app_id) ->
+    # deletes the containers and relaunches
+    # useful if skyl/clientstate-service has been upgraded
+    $http.post("/apps/#{app_id}/relaunch").success (res) ->
+      $scope.get_apps()
 
   init = () ->
     if $scope.$storage.github_access_token?
